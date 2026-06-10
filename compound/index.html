@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Compound — your next 365 days, in one scroll</title>
+  <meta name="description" content="Compound builds and runs AI-native growth engines for premium businesses. No deck, no 'capabilities' — scroll through the year we build you: acquisition, WhatsApp conversion, booked consultations, compounding data you own." />
+  <meta name="theme-color" content="#100e0b" />
+  <meta property="og:title" content="Compound — your next 365 days, in one scroll" />
+  <meta property="og:description" content="Most agencies show you a deck. We'd rather show you the year. An AI-native growth firm — New Delhi → everywhere." />
+  <meta property="og:type" content="website" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23100e0b'/%3E%3Ctext x='27' y='44' font-family='Georgia,serif' font-size='34' fill='%23F3EFE6' text-anchor='middle'%3EC%3C/text%3E%3Ctext x='47' y='28' font-family='Georgia,serif' font-size='18' fill='%23C2914C' text-anchor='middle'%3En%3C/text%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=IBM+Plex+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <noscript><style>
+    .reveal,.kin .kw i{opacity:1;transform:none}
+    #boot,#cursor,.hud{display:none!important}
+    .noscript-note{display:block!important}
+  </style></noscript>
+</head>
+<body>
+
+  <!-- boot -->
+  <div id="boot" aria-hidden="true">
+    <p class="boot__mark">compound<sup>n</sup></p>
+    <p class="boot__line mono"><span id="bootEq">1.01<sup>1</sup> = 1.01</span></p>
+    <p class="boot__sub mono">compiling your next 365 days</p>
+  </div>
+
+  <!-- the field -->
+  <canvas id="field" aria-hidden="true"></canvas>
+
+  <!-- chrome -->
+  <header class="nav" id="nav">
+    <a class="nav__mark" href="#top" aria-label="Compound — back to day zero">compound<sup>n</sup></a>
+    <a class="nav__skip mono" href="#begin">Skip to Day 365 <span aria-hidden="true">&rarr;</span></a>
+  </header>
+
+  <div class="hud" aria-hidden="true">
+    <div class="hud__day">
+      <span class="hud__dayLabel mono">DAY</span>
+      <span class="hud__dayNum mono" id="dayNum">000</span>
+      <span class="hud__dayOf mono">/ 365</span>
+    </div>
+    <div class="hud__chapter mono" id="chapterTag">00 · DAY ZERO</div>
+    <div class="hud__rail"><span id="railFill"></span></div>
+  </div>
+
+  <div id="cursor" aria-hidden="true"><span id="cursorTag"></span></div>
+
+  <p class="noscript-note mono" style="display:none">JavaScript is off — the year won&rsquo;t animate, but every word below still works. So does WhatsApp.</p>
+
+  <main id="top">
+
+    <!-- ======== CH 00 · DAY ZERO ======== -->
+    <section class="ch ch--zero" id="zero" data-days="0,7" data-tag="00 · DAY ZERO" data-beh="0">
+      <div class="ch__pin">
+        <div class="ch__inner ch__inner--center">
+          <p class="eyebrow mono reveal">Compound · an AI-native growth firm · New Delhi &rarr; everywhere</p>
+          <h1 class="kin kin--hero" aria-label="Most agencies show you a deck. We'd rather show you the year.">
+            <span class="kin__line"><span class="kw"><i>Most</i></span> <span class="kw"><i>agencies</i></span> <span class="kw"><i>show</i></span> <span class="kw"><i>you</i></span> <span class="kw"><i>a&nbsp;deck.</i></span></span>
+            <span class="kin__line kin__line--accent"><span class="kw"><i>We&rsquo;d</i></span> <span class="kw"><i>rather</i></span> <span class="kw"><i>show</i></span> <span class="kw"><i>you</i></span> <span class="kw"><i>the&nbsp;year.</i></span></span>
+          </h1>
+          <p class="lede reveal">This page is the next 365 days of your business — the growth engine we build and run, in the order we build it. Strangers in, revenue out, data back in. You own all of it.</p>
+          <p class="scrollcue mono reveal">scroll — every pixel is a day<span class="scrollcue__bar" aria-hidden="true"></span></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======== CH 01 · THE LEAK ======== -->
+    <section class="ch ch--leak" id="leak" data-days="8,29" data-tag="01 · THE LEAK" data-beh="1">
+      <div class="ch__pin">
+        <div class="ch__inner">
+          <p class="kicker mono reveal">Days 1–29 · status quo</p>
+          <h2 class="kin" aria-label="Right now, this is your funnel.">
+            <span class="kin__line"><span class="kw"><i>Right</i></span> <span class="kw"><i>now,</i></span> <span class="kw"><i>this</i></span> <span class="kw"><i>is</i></span></span>
+            <span class="kin__line"><span class="kw"><i>your</i></span> <span class="kw"><i>funnel.</i></span></span>
+          </h2>
+          <div class="ch__copy reveal">
+            <p>Each light is a stranger who wanted what you sell. They see an ad somebody&rsquo;s nephew boosted. They WhatsApp you at 9 pm. Nobody replies until Tuesday.</p>
+            <p>They buy from whoever answered Monday. Watch them drift off this screen — that&rsquo;s the leak, and you&rsquo;re paying for every light that leaves.</p>
+            <p class="ch__aside">The agency you&rsquo;d normally hire to fix this died in 2026 — automated by its own tools, survived by ten thousand retainers. <em>In lieu of flowers, keep scrolling.</em></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======== CH 02 · IGNITION ======== -->
+    <section class="ch ch--attract" id="attract" data-days="30,59" data-tag="02 · ATTRACT" data-beh="2">
+      <div class="ch__pin">
+        <div class="ch__inner">
+          <p class="kicker mono reveal">Day 30 · ignition</p>
+          <h2 class="kin" aria-label="Acquisition switches on.">
+            <span class="kin__line"><span class="kw"><i>Acquisition</i></span></span>
+            <span class="kin__line kin__line--accent"><span class="kw"><i>switches</i></span> <span class="kw"><i>on.</i></span></span>
+          </h2>
+          <div class="ch__copy reveal">
+            <p>AI generates and tests the creative. Humans with taste judge it. The strangers stop drifting — they start bending toward you.</p>
+            <p>Every rupee answers to one number: <em>cost per booked consultation.</em> Not clicks. Not reach. Not &ldquo;brand lift.&rdquo; Booked.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======== CH 03 · CONVERT + DEMO ======== -->
+    <section class="ch ch--convert" id="convert" data-days="60,118" data-tag="03 · CONVERT" data-beh="3">
+      <div class="ch__flow">
+        <div class="ch__inner">
+          <p class="kicker mono reveal">Day 60 · the funnel learns manners</p>
+          <h2 class="kin" aria-label="You never say 'we'll call you back' again.">
+            <span class="kin__line"><span class="kw"><i>You</i></span> <span class="kw"><i>never</i></span> <span class="kw"><i>say</i></span></span>
+            <span class="kin__line kin__line--accent"><span class="kw"><i>&ldquo;we&rsquo;ll</i></span> <span class="kw"><i>call</i></span> <span class="kw"><i>you</i></span> <span class="kw"><i>back&rdquo;</i></span></span>
+            <span class="kin__line"><span class="kw"><i>again.</i></span></span>
+          </h2>
+          <div class="ch__copy reveal">
+            <p>India runs on WhatsApp, so the engine does too. Every inquiry answered in seconds, qualified in minutes — budget, scope, timeline — politely, in your brand&rsquo;s voice, at 2 a.m. if that&rsquo;s when they write.</p>
+            <p class="ch__aside">Don&rsquo;t take our word for it. Below is a working replica of the funnel we run for a premium interiors studio in Delhi — names changed, mechanics intact. <em>You play the customer. The clock starts when you reply.</em></p>
+          </div>
+        </div>
+
+        <div class="demo__stage">
+          <div class="phone reveal" id="phone">
+            <div class="phone__header">
+              <div class="phone__avatar" aria-hidden="true">AD</div>
+              <div class="phone__id">
+                <p class="phone__name">Atelier Dhara</p>
+                <p class="phone__status" id="chatStatus">online</p>
+              </div>
+              <div class="phone__timer mono" id="chatTimer" aria-label="Elapsed time">0:00</div>
+            </div>
+            <div class="phone__scroll" id="chatScroll">
+              <div class="phone__chat" id="chatLog" aria-live="polite"><noscript><p class="msg msg--note">JavaScript is off, so the simulation can&rsquo;t run here. The real engine, of course, runs anyway — WhatsApp us.</p></noscript></div>
+            </div>
+            <div class="phone__chips" id="chatChips"></div>
+            <div class="phone__inputbar" aria-hidden="true">
+              <span class="phone__inputhint">The engine answers for the studio — in seconds, at any hour.</span>
+            </div>
+          </div>
+
+          <aside class="demo__result" id="demoResult" hidden>
+            <p class="demo__bigtime mono"><span id="finalTime">0:00</span></p>
+            <p class="demo__verdict">Booked — while the studio slept.</p>
+            <p class="demo__copy">No forms. No &ldquo;we&rsquo;ll call you back.&rdquo; Premium customers buy from whoever answers first — the engine makes sure that&rsquo;s you.</p>
+            <div class="demo__ctaRow">
+              <a class="btn btn--brass" href="#begin" data-cursor="DAY 365">Get this engine <span class="btn__arrow">&rarr;</span></a>
+              <button class="btn btn--ghost" id="replayDemo" type="button" data-cursor="REPLAY">Replay <span class="btn__arrow">&#8635;</span></button>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======== CH 04 · BOOK ======== -->
+    <section class="ch ch--book" id="book" data-days="119,179" data-tag="04 · BOOK" data-beh="4">
+      <div class="ch__pin">
+        <div class="ch__inner">
+          <p class="kicker mono reveal">Day 120 · the calendar</p>
+          <h2 class="kin" aria-label="Your calendar stops being hopeful and starts being full.">
+            <span class="kin__line"><span class="kw"><i>Your</i></span> <span class="kw"><i>calendar</i></span> <span class="kw"><i>stops</i></span></span>
+            <span class="kin__line"><span class="kw"><i>being</i></span> <span class="kw"><i>hopeful</i></span></span>
+            <span class="kin__line kin__line--accent"><span class="kw"><i>and</i></span> <span class="kw"><i>starts</i></span> <span class="kw"><i>being</i></span> <span class="kw"><i>full.</i></span></span>
+          </h2>
+          <div class="ch__copy reveal">
+            <p>Qualified leads don&rsquo;t sit in spreadsheets. They land on calendars as consultations with context attached — what they want, what they&rsquo;ll spend, what they&rsquo;ve already seen and loved.</p>
+            <p>Watch the lights dock. Each cell is a conversation your competitors didn&rsquo;t get.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======== CH 05 · COMPOUND ======== -->
+    <section class="ch ch--compound" id="compound" data-days="180,269" data-tag="05 · COMPOUND" data-beh="5">
+      <div class="ch__pin">
+        <div class="ch__inner">
+          <p class="kicker mono reveal">Day 180 · the loop closes</p>
+          <h2 class="kin" aria-label="Campaigns spike. Systems compound.">
+            <span class="kin__line"><span class="kw"><i>Campaigns</i></span> <span class="kw"><i>spike.</i></span></span>
+            <span class="kin__line kin__line--accent"><span class="kw"><i>Systems</i></span> <span class="kw"><i>compound.</i></span></span>
+          </h2>
+          <div class="ch__copy reveal">
+            <p>Every conversation becomes data you own. The engine learns which ads bring buyers, which words book consults, which clients refer — and feeds it all back to day one. Output becomes input.</p>
+            <p>This is the part no agency ever built you. It ends the retainer.</p>
+          </div>
+          <p class="liveEq" id="liveEq" aria-hidden="true">1.01<sup id="liveExp">180</sup> <span class="liveEq__eq">=</span> <span class="liveEq__res" id="liveRes">5.99</span><span class="liveEq__x">&times;</span></p>
+          <p class="liveEq__note mono reveal">one percent, daily — live, as you scroll</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======== CH 06 · PROOF ======== -->
+    <section class="ch ch--proof" id="proof" data-days="270,319" data-tag="06 · PROOF" data-beh="6">
+      <div class="ch__flow">
+        <div class="ch__inner ch__inner--wide">
+          <p class="kicker mono reveal">Day 270 · in production</p>
+          <h2 class="kin" aria-label="Engine №001 is not a case study. It's running.">
+            <span class="kin__line"><span class="kw"><i>Engine</i></span> <span class="kw"><i>№001</i></span> <span class="kw"><i>is</i></span> <span class="kw"><i>not</i></span></span>
+            <span class="kin__line"><span class="kw"><i>a</i></span> <span class="kw"><i>case</i></span> <span class="kw"><i>study.</i></span></span>
+            <span class="kin__line kin__line--accent"><span class="kw"><i>It&rsquo;s</i></span> <span class="kw"><i>running.</i></span></span>
+          </h2>
+          <p class="ch__copy reveal">Premium interiors · New Delhi · every light on this ledger is live right now:</p>
+          <ul class="ledger reveal">
+            <li class="ledger__row">
+              <span class="ledger__name">Paid acquisition</span>
+              <span class="ledger__desc">Meta &amp; Google, tuned to cost per consultation</span>
+              <span class="ledger__status"><span class="dot" aria-hidden="true"></span>Live</span>
+            </li>
+            <li class="ledger__row">
+              <span class="ledger__name">WhatsApp conversion funnel</span>
+              <span class="ledger__desc">AI-qualified, human-warm, minutes not days</span>
+              <span class="ledger__status"><span class="dot" aria-hidden="true"></span>Live</span>
+            </li>
+            <li class="ledger__row">
+              <span class="ledger__name">&ldquo;See it on your wall&rdquo;</span>
+              <span class="ledger__desc">AI room visualizer, run on clients&rsquo; own homes</span>
+              <span class="ledger__status"><span class="dot" aria-hidden="true"></span>Live</span>
+            </li>
+            <li class="ledger__row">
+              <span class="ledger__name">Reputation engine</span>
+              <span class="ledger__desc">Reviews captured at the moment of delight</span>
+              <span class="ledger__status"><span class="dot" aria-hidden="true"></span>Live</span>
+            </li>
+            <li class="ledger__row">
+              <span class="ledger__name">Trade pipeline</span>
+              <span class="ledger__desc">B2B referral system — designers &amp; architects</span>
+              <span class="ledger__status"><span class="dot" aria-hidden="true"></span>Live</span>
+            </li>
+          </ul>
+          <p class="ch__aside reveal"><em>Performance figures are shared in conversation, with context — not on websites. Bring your skepticism.</em></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======== CH 07 · TERMS ======== -->
+    <section class="ch ch--terms" id="terms" data-days="320,364" data-tag="07 · THE TERMS" data-beh="6">
+      <div class="ch__flow">
+        <div class="ch__inner">
+          <p class="kicker mono reveal">Day 320 · the terms</p>
+          <h2 class="kin" aria-label="You own the asset. We run it.">
+            <span class="kin__line"><span class="kw"><i>You</i></span> <span class="kw"><i>own</i></span> <span class="kw"><i>the</i></span> <span class="kw"><i>asset.</i></span></span>
+            <span class="kin__line kin__line--accent"><span class="kw"><i>We</i></span> <span class="kw"><i>run</i></span> <span class="kw"><i>it.</i></span></span>
+          </h2>
+          <ol class="clauses">
+            <li class="clause reveal">
+              <p class="clause__no">I.</p>
+              <div>
+                <h3 class="clause__title">Your data is yours.</h3>
+                <p class="clause__text">Every lead, conversation and insight lives in accounts you control. If we ever part ways, the engine stays with you. Agencies build dependence; we build your equity.</p>
+              </div>
+            </li>
+            <li class="clause reveal">
+              <p class="clause__no">II.</p>
+              <div>
+                <h3 class="clause__title">Outcomes, not hours.</h3>
+                <p class="clause__text">We are measured against booked consultations and revenue — not decks delivered, not posts published. Our reporting reads like your P&amp;L, because that&rsquo;s what we answer to.</p>
+              </div>
+            </li>
+            <li class="clause reveal">
+              <p class="clause__no">III.</p>
+              <div>
+                <h3 class="clause__title">One per market.</h3>
+                <p class="clause__text">We run one engine per category, per city. Your market, defended. The only question is whether the engine in your city is yours or your competitor&rsquo;s.</p>
+              </div>
+            </li>
+          </ol>
+          <p class="who mono reveal">Built for businesses with taste — interiors &amp; architecture · luxury real estate · clinics &amp; aesthetics · premium retail. High ticket, high craft, allergic to &ldquo;content calendars.&rdquo;</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======== CH 08 · DAY 365 ======== -->
+    <section class="ch ch--begin" id="begin" data-days="364,365" data-tag="08 · BEGIN" data-beh="7">
+      <div class="ch__pin">
+        <div class="ch__inner ch__inner--center">
+          <p class="kicker mono reveal">Day 365</p>
+          <h2 class="kin kin--final" aria-label="Day 365 arrives either way. The only question is whose engine exists by then.">
+            <span class="kin__line"><span class="kw"><i>Day</i></span> <span class="kw"><i>365</i></span> <span class="kw"><i>arrives</i></span> <span class="kw"><i>either</i></span> <span class="kw"><i>way.</i></span></span>
+            <span class="kin__line kin__line--accent"><span class="kw"><i>The</i></span> <span class="kw"><i>only</i></span> <span class="kw"><i>question</i></span> <span class="kw"><i>is</i></span> <span class="kw"><i>whose</i></span></span>
+            <span class="kin__line kin__line--accent"><span class="kw"><i>engine</i></span> <span class="kw"><i>exists</i></span> <span class="kw"><i>by</i></span> <span class="kw"><i>then.</i></span></span>
+          </h2>
+          <p class="lede reveal">Message us on WhatsApp. A human answers — assisted by the machine, in minutes, like everything we build.</p>
+          <div class="begin__actions reveal">
+            <a class="btn btn--brass btn--big" id="waMain" href="https://wa.me/919999999999?text=Hi%20Compound%20%E2%80%94%20I%20run%20a%20premium%20business%20and%20I%20want%20a%20growth%20engine.%20Day%20one%20is%20today." target="_blank" rel="noopener" data-cursor="WHATSAPP">
+              <svg class="wa" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.6-6.1c-.3-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.3-.6.8-.8 1-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.4-2.9c-.3-.4 0-.5.1-.7l.4-.5c.1-.2.1-.3.2-.5 0-.2 0-.4-.1-.5l-.8-1.9c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5 0-.7.3-.3.3-1 .9-1 2.2s1 2.6 1.1 2.8c.1.2 2 3.1 4.9 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.6-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.6-.3Z"/></svg>
+              Start your Day One
+            </a>
+            <a class="btn btn--ghost btn--big" id="mailLink" href="mailto:hello@compound.in?subject=A%20growth%20engine%20for%20my%20business" data-cursor="EMAIL">hello@compound.in</a>
+          </div>
+          <p class="begin__where mono reveal">New Delhi · Gurugram · everywhere after that · one engine per category, per city</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- tape + colophon -->
+  <div class="tape" aria-hidden="true">
+    <div class="tape__track">
+      <span class="tape__run">lead qualified 02:14 AM&ensp;·&ensp;consultation booked&ensp;·&ensp;review captured at handover&ensp;·&ensp;referral logged&ensp;·&ensp;creative №38 retired, №39 live&ensp;·&ensp;cost per consultation ↓&ensp;·&ensp;architect pipeline +1&ensp;·&ensp;visualizer session → site visit&ensp;·&ensp;day 366: it keeps going&ensp;·&ensp;</span>
+      <span class="tape__run">lead qualified 02:14 AM&ensp;·&ensp;consultation booked&ensp;·&ensp;review captured at handover&ensp;·&ensp;referral logged&ensp;·&ensp;creative №38 retired, №39 live&ensp;·&ensp;cost per consultation ↓&ensp;·&ensp;architect pipeline +1&ensp;·&ensp;visualizer session → site visit&ensp;·&ensp;day 366: it keeps going&ensp;·&ensp;</span>
+    </div>
+  </div>
+
+  <footer class="colophon">
+    <div class="colophon__grid">
+      <p class="colophon__mark">compound<sup>n</sup></p>
+      <div class="colophon__text">
+        <p>An AI-native growth firm. We build growth engines for premium businesses — and we built this site in-house, like everything we ship. The particles, the physics, the year: handwritten, no libraries, no trackers.</p>
+        <p class="colophon__fine mono">Set in Fraunces, Instrument Sans &amp; IBM Plex Mono. © 2026 Compound. 1.01<sup>365</sup> = 37.78.</p>
+      </div>
+      <nav class="colophon__nav" aria-label="Footer">
+        <a href="#leak">The leak</a>
+        <a href="#convert">The demo</a>
+        <a href="#proof">Proof</a>
+        <a href="#terms">Terms</a>
+        <a href="#begin">Day 365</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script src="engine.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
