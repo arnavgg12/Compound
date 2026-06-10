@@ -21,10 +21,10 @@ varying float vAlpha;
 void main() {
   vec2 clip = (aPos / uRes) * 2.0 - 1.0;
   gl_Position = vec4(clip.x, -clip.y, 0.0, 1.0);
-  gl_PointSize = (2.5 + aDat.x * 2.2 + aDat.y * 3.0) * uSize;
+  gl_PointSize = (2.2 + aDat.x * 1.8 + aDat.y * 2.6) * uSize;
   vSt = aDat.x;
   vFlash = aDat.y;
-  vAlpha = (0.52 + aDat.x * 0.34 + aDat.y * 0.60) * uDim * (0.72 + 0.28 * fract(aDat.z * 13.7));
+  vAlpha = (0.45 + aDat.x * 0.34 + aDat.y * 0.60) * uDim * (0.72 + 0.28 * fract(aDat.z * 13.7));
 }`;
 
   const POINT_FS = `
@@ -55,6 +55,24 @@ void main() { gl_Position = vec4(aPos, 0.0, 1.0); }`;
 precision mediump float;
 uniform float uFade;
 void main() { gl_FragColor = vec4(0.063, 0.055, 0.043, uFade); }`;
+
+  /* hairline trail segments — same varyings as points, no disc mask
+     (gl_PointCoord is undefined for lines) */
+  const LINE_FS = `
+precision mediump float;
+varying float vSt;
+varying float vFlash;
+varying float vAlpha;
+void main() {
+  vec3 c0 = vec3(0.90, 0.86, 0.78);
+  vec3 c1 = vec3(0.96, 0.69, 0.34);
+  vec3 c2 = vec3(1.00, 0.90, 0.66);
+  vec3 col = vSt < 1.0
+    ? mix(c0, c1, clamp(vSt, 0.0, 1.0))
+    : mix(c1, c2, clamp(vSt - 1.0, 0.0, 1.0));
+  col = mix(col, vec3(0.66, 1.0, 0.72), vFlash * 0.6);
+  gl_FragColor = vec4(col, 1.0) * (vAlpha * 0.5);
+}`;
 
   /* present the accumulation texture on the canvas */
   const BLIT_VS = `
@@ -147,7 +165,8 @@ void main() {
 
     /* All GL objects live behind initGL() so a lost context can rebuild
        them — programs, locations and buffers die with the old context. */
-    let progP, progG, progF, progB, locP, locG, locF, locB, triBuf, partBuf, cellBuf;
+    let progP, progG, progF, progB, progL, locP, locG, locF, locB, locL;
+    let triBuf, partBuf, cellBuf, lineBuf;
     let fbo = null, fboTex = null, fboW = 0, fboH = 0;
     let lost = false;
 
@@ -156,7 +175,8 @@ void main() {
       progG = program(gl, GLOW_VS, GLOW_FS);
       progF = program(gl, GLOW_VS, FADE_FS);
       progB = program(gl, BLIT_VS, BLIT_FS);
-      if (!progP || !progG || !progF || !progB) return false;
+      progL = program(gl, POINT_VS, LINE_FS);
+      if (!progP || !progG || !progF || !progB || !progL) return false;
 
       locP = {
         aPos: gl.getAttribLocation(progP, "aPos"),
@@ -185,6 +205,13 @@ void main() {
         aPos: gl.getAttribLocation(progB, "aPos"),
         uTex: gl.getUniformLocation(progB, "uTex"),
       };
+      locL = {
+        aPos: gl.getAttribLocation(progL, "aPos"),
+        aDat: gl.getAttribLocation(progL, "aDat"),
+        uRes: gl.getUniformLocation(progL, "uRes"),
+        uSize: gl.getUniformLocation(progL, "uSize"),
+        uDim: gl.getUniformLocation(progL, "uDim"),
+      };
 
       /* glow geometry: one fullscreen triangle */
       triBuf = gl.createBuffer();
@@ -193,6 +220,7 @@ void main() {
 
       partBuf = gl.createBuffer();
       cellBuf = gl.createBuffer();
+      lineBuf = gl.createBuffer();
 
       gl.disable(gl.DEPTH_TEST);
       gl.enable(gl.BLEND);
@@ -219,8 +247,9 @@ void main() {
 
     let W = 1, H = 1, DPR = 1;
     let N = 0;            // particle capacity
-    let px, py, vx, vy, st, fl, seed;   // particle fields
+    let px, py, vx, vy, px0, py0, st, fl, seed;   // particle fields
     let inter;            // interleaved upload buffer (N * 5)
+    let lineInter;        // trail segments, 2 verts per particle (N * 10)
 
     /* calendar lattice */
     const COLS = 7, ROWS = 5, CELLS = COLS * ROWS;
@@ -233,6 +262,7 @@ void main() {
     let massPulse = 0, burstT = 0;
     let time = 0;
     let lastUploadN = -1; /* reduced mode: skip identical re-uploads */
+    let lastDtN = 1; /* trail fade must be frame-rate independent */
 
     const state = {
       day: 0,
@@ -254,6 +284,8 @@ void main() {
       const s = 0.4 + Math.random() * 0.8;
       vx[i] = Math.cos(a) * s;
       vy[i] = Math.sin(a) * s;
+      px0[i] = px[i]; /* teleport — no trail across the screen */
+      py0[i] = py[i];
       st[i] = 0;
       fl[i] = 0;
     }
@@ -265,6 +297,8 @@ void main() {
       const s = Math.random() * 0.5;
       vx[i] = Math.cos(a) * s;
       vy[i] = Math.sin(a) * s;
+      px0[i] = px[i];
+      py0[i] = py[i];
       st[i] = 0;
       fl[i] = 0;
     }
@@ -304,15 +338,17 @@ void main() {
       ringR = Math.min(W, H) * (mobile ? 0.30 : 0.26);
       sizeScale = clamp(Math.min(W, H) / 800, 0.8, 1.5) * DPR;
 
-      const target = Math.round(clamp((W * H) / 60, 3500, 16000));
+      const target = Math.round(clamp((W * H) / 80, 3000, 12000));
       if (target !== N) {
         N = target;
         lastUploadN = -1;
         px = new Float32Array(N); py = new Float32Array(N);
         vx = new Float32Array(N); vy = new Float32Array(N);
+        px0 = new Float32Array(N); py0 = new Float32Array(N);
         st = new Float32Array(N); fl = new Float32Array(N);
         seed = new Float32Array(N);
         inter = new Float32Array(N * 5);
+        lineInter = new Float32Array(N * 10);
         for (let i = 0; i < N; i++) { seed[i] = Math.random(); scatter(i); }
       }
 
@@ -334,7 +370,7 @@ void main() {
 
     function aliveCount() {
       const d = clamp(state.day / 365, 0, 1);
-      return Math.max(48, Math.floor(N * (0.35 + 0.65 * Math.pow(d, 1.6))));
+      return Math.max(48, Math.floor(N * (0.18 + 0.82 * Math.pow(d, 1.6))));
     }
 
     function sim(dtN) {
@@ -342,9 +378,9 @@ void main() {
       const n = aliveCount();
       const pOn = state.pointerOn;
       const pX = state.pointerX, pY = state.pointerY;
-      const wind = clamp(state.scrollVel * -0.009, -1.2, 1.2);
+      const wind = clamp(state.scrollVel * -0.006, -0.8, 0.8);
       const coreR = massRadius() * 0.55;
-      const damp = Math.pow(0.955, dtN);
+      const damp = Math.pow(0.945, dtN);
 
       for (let k = 0; k < CELLS; k++) cellGlow[k] *= Math.pow(0.93, dtN);
 
@@ -365,7 +401,7 @@ void main() {
           /* DAY ZERO — a slow galaxy turning behind the headline */
           const gx = px[i] - W * 0.5, gy = py[i] - H * 0.45;
           const gd = Math.sqrt(gx * gx + gy * gy) || 1;
-          const sw = 0.16 * Math.min(1, 260 / gd);
+          const sw = 0.09 * Math.min(1, 260 / gd);
           ax += (-gy / gd) * sw - gx * 0.00012;
           ay += (gx / gd) * sw - gy * 0.00012;
         } else if (beh === 1) {
@@ -432,7 +468,7 @@ void main() {
           const qx = pX - px[i], qy = pY - py[i];
           const qd = Math.sqrt(qx * qx + qy * qy);
           if (qd < 240 && qd > 0.5) {
-            const f = (1 - qd / 240) * 0.15;
+            const f = (1 - qd / 240) * 0.10;
             ax += (qx / qd) * f;
             ay += (qy / qd) * f;
           }
@@ -443,7 +479,9 @@ void main() {
         vx[i] = (vx[i] + ax * dtN) * damp;
         vy[i] = (vy[i] + ay * dtN) * damp;
         const sp2 = vx[i] * vx[i] + vy[i] * vy[i];
-        if (sp2 > 16) { const s = 4 / Math.sqrt(sp2); vx[i] *= s; vy[i] *= s; }
+        if (sp2 > 9) { const s = 3 / Math.sqrt(sp2); vx[i] *= s; vy[i] *= s; }
+        px0[i] = px[i]; /* trail segment spans this frame's motion */
+        py0[i] = py[i];
         px[i] += vx[i] * dtN;
         py[i] += vy[i] * dtN;
         fl[i] *= Math.pow(0.94, dtN);
@@ -498,11 +536,13 @@ void main() {
     }
 
     /* shorter fade = longer comet trails */
-    const FADE_BY_BEH = [0.10, 0.16, 0.12, 0.12, 0.18, 0.10, 0.20, 0.085];
+    const FADE_BY_BEH = [0.16, 0.20, 0.16, 0.16, 0.22, 0.15, 0.25, 0.12];
 
     function render(n) {
       const beh = state.beh;
       const dim = state.dim;
+
+      gl.bindFramebuffer(gl.FRAMEBUFFER, fbo); /* accumulate trails offscreen */
 
       if (reduced) {
         gl.clear(gl.COLOR_BUFFER_BIT); /* static field — no trails */
@@ -511,7 +551,10 @@ void main() {
         gl.bindBuffer(gl.ARRAY_BUFFER, triBuf);
         gl.enableVertexAttribArray(locF.aPos);
         gl.vertexAttribPointer(locF.aPos, 2, gl.FLOAT, false, 0, 0);
-        gl.uniform1f(locF.uFade, FADE_BY_BEH[beh] || 0.14);
+        /* compound the per-frame wash by elapsed sim time so trail length
+           reads the same at 60fps and in throttled 15fps webviews */
+        const base = FADE_BY_BEH[beh] || 0.14;
+        gl.uniform1f(locF.uFade, 1 - Math.pow(1 - base, lastDtN));
         gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
         gl.drawArrays(gl.TRIANGLES, 0, 3);
         gl.blendFunc(gl.ONE, gl.ONE); /* back to additive for the lights */
@@ -552,11 +595,52 @@ void main() {
         drawPoints(cellBuf, CELLS, dim * 0.9);
       }
 
+      /* hairline trails — smooth continuous streaks, not dotted scratch */
+      if (!reduced) {
+        for (let i = 0; i < n; i++) {
+          const o = i * 10;
+          lineInter[o] = px0[i];
+          lineInter[o + 1] = py0[i];
+          lineInter[o + 2] = st[i];
+          lineInter[o + 3] = fl[i];
+          lineInter[o + 4] = seed[i];
+          lineInter[o + 5] = px[i];
+          lineInter[o + 6] = py[i];
+          lineInter[o + 7] = st[i];
+          lineInter[o + 8] = fl[i];
+          lineInter[o + 9] = seed[i];
+        }
+        gl.useProgram(progL);
+        gl.bindBuffer(gl.ARRAY_BUFFER, lineBuf);
+        gl.bufferData(gl.ARRAY_BUFFER, lineInter.subarray(0, n * 10), gl.DYNAMIC_DRAW);
+        gl.enableVertexAttribArray(locL.aPos);
+        gl.enableVertexAttribArray(locL.aDat);
+        gl.vertexAttribPointer(locL.aPos, 2, gl.FLOAT, false, 20, 0);
+        gl.vertexAttribPointer(locL.aDat, 3, gl.FLOAT, false, 20, 8);
+        gl.uniform2f(locL.uRes, W, H);
+        gl.uniform1f(locL.uSize, sizeScale);
+        gl.uniform1f(locL.uDim, dim);
+        gl.drawArrays(gl.LINES, 0, n * 2);
+      }
+
       if (!reduced || n !== lastUploadN) {
         uploadParticles(n);
         lastUploadN = n;
       }
       drawPoints(partBuf, n, dim);
+
+      /* present the accumulation texture on the canvas */
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+      gl.useProgram(progB);
+      gl.bindBuffer(gl.ARRAY_BUFFER, triBuf);
+      gl.enableVertexAttribArray(locB.aPos);
+      gl.vertexAttribPointer(locB.aPos, 2, gl.FLOAT, false, 0, 0);
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, fboTex);
+      gl.uniform1i(locB.uTex, 0);
+      gl.disable(gl.BLEND);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+      gl.enable(gl.BLEND);
     }
 
     /* ---------- public ---------- */
@@ -592,6 +676,7 @@ void main() {
           time += dt;
           massPulse *= 0.92;
           burstT = Math.max(0, burstT - dt * 1.4);
+          lastDtN = clamp(dt * 60, 0.5, 3.5);
           n = sim(clamp(dt * 60, 0.5, 2.2));
         }
         render(n);

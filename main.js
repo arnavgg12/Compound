@@ -31,6 +31,9 @@ const safeStorage = {
   set(k, v) { try { sessionStorage.setItem(k, v); } catch (e) { /* boot replays */ } },
 };
 
+let choreoStarted = false; /* must precede the boot IIFE — its early-return
+  path calls startChoreography() synchronously (TDZ otherwise) */
+
 const boot = document.getElementById("boot");
 (function runBoot() {
   if (REDUCED || safeStorage.get("compound-booted")) {
@@ -313,7 +316,6 @@ document.querySelectorAll(".ch__inner, .colophon").forEach((scope) => {
 
 /* …but observation waits for the boot curtain, else the hero entrance
    plays unseen behind the opaque overlay on every first visit */
-let choreoStarted = false;
 function startChoreography() {
   if (choreoStarted) return;
   choreoStarted = true;
@@ -329,10 +331,16 @@ function startChoreography() {
       },
       { threshold, rootMargin }
     );
+  /* throttled webviews can starve IO delivery — anything already on
+     screen reveals immediately, observers cover the rest */
+  const seedNow = (el) => {
+    const r = el.getBoundingClientRect();
+    if (r.top < innerHeight && r.bottom > 0) el.classList.add("is-in");
+  };
   const kinIO = enterIO(0.3);
-  document.querySelectorAll(".kin").forEach((el) => kinIO.observe(el));
+  document.querySelectorAll(".kin").forEach((el) => { kinIO.observe(el); seedNow(el); });
   const revealIO = enterIO(0.15, "0px 0px -4% 0px");
-  document.querySelectorAll(".reveal").forEach((el) => revealIO.observe(el));
+  document.querySelectorAll(".reveal").forEach((el) => { revealIO.observe(el); seedNow(el); });
 }
 
 /* ---------- cursor hover states (movement lives in the conductor) ---------- */
