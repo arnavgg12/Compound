@@ -306,7 +306,9 @@ void main() {
     function resize() {
       W = canvas.clientWidth || innerWidth;
       H = canvas.clientHeight || innerHeight;
-      DPR = clamp(devicePixelRatio || 1, 1, W > 760 ? 1.75 : 1.5);
+      /* phones: cap DPR low — three fullscreen passes (fade/glow/blit)
+         at 1.5x are too heavy for mid-range mobile GPUs */
+      DPR = clamp(devicePixelRatio || 1, 1, W > 760 ? 1.75 : 1.25);
       canvas.width = Math.round(W * DPR);
       canvas.height = Math.round(H * DPR);
       if (!lost) {

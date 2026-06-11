@@ -103,11 +103,12 @@ let measureQueued = false;
 new ResizeObserver(() => {
   if (measureQueued) return;
   measureQueued = true;
-  requestAnimationFrame(() => {
+  /* content growth (demo result etc.) shifts section tops — remeasure
+     only; the conductor's viewport poll handles real engine resizes */
+  setTimeout(() => {
     measureQueued = false;
     measure();
-    if (engine) engine.resize();
-  });
+  }, 80);
 }).observe(document.body);
 
 /* ---------- HUD elements ---------- */
@@ -202,8 +203,10 @@ function frame(now) {
   const dt = clamp((now - lastT) / 1000, 0.001, 0.05);
   lastT = now;
 
-  /* viewport poll — ResizeObserver can stall in suspended docs */
-  if (innerWidth !== lastVW || innerHeight !== lastVH) {
+  /* viewport poll — ResizeObserver can stall in suspended docs.
+     Ignore small height-only deltas: the mobile URL bar fires them on
+     every scroll flick, and a full engine rebuild per flick = stutter. */
+  if (innerWidth !== lastVW || Math.abs(innerHeight - lastVH) > 150) {
     lastVW = innerWidth;
     lastVH = innerHeight;
     measure();
@@ -219,7 +222,10 @@ function frame(now) {
   /* anchor at viewport top: day 000 at rest, chapter handoff exactly
      when the next pinned headline takes the screen */
   const sc = smooth + 1;
-  const { day, beh, tag } = dayAt(sc);
+  let { day, beh, tag } = dayAt(sc);
+  /* the year must complete at the absolute bottom even when the page
+     tail is shorter than the viewport */
+  if (target + innerHeight >= document.body.scrollHeight - 4) day = 365;
   const d = Math.round(day);
 
   /* HUD */

@@ -30,7 +30,7 @@
   --sans: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: "IBM Plex Mono", "Cascadia Mono", Consolas, monospace;
 
-  --fs-h1: clamp(2.6rem, 8.4vw, 7.4rem);
+  --fs-h1: clamp(2.2rem, 8.4vw, 7.4rem);
   --fs-h2: clamp(2.05rem, 5.6vw, 4.3rem);
   --fs-lede: clamp(1.08rem, 1.3vw + 0.8rem, 1.3rem);
   --fs-body: clamp(1rem, 0.4vw + 0.9rem, 1.1rem);
@@ -173,6 +173,7 @@ main { position: relative; z-index: 1; }
   border: 1px solid var(--ink-line);
   border-radius: 999px;
   padding: 0.55em 1.1em;
+  white-space: nowrap;
   transition: color 0.3s var(--ease), border-color 0.3s var(--ease), background 0.3s var(--ease);
 }
 .nav__skip:hover { color: var(--ink); background: var(--brass); border-color: var(--brass); }
@@ -240,6 +241,28 @@ body.hud--end .hud__day, body.hud--end .hud__chapter, body.hud--end .hud__rail {
 
 @media (max-width: 600px) {
   .hud__chapter { display: none; }
+  .hud__dayNum { font-size: 1.7rem; }
+  .hud__dayLabel { font-size: 0.56rem; }
+}
+
+/* phones: no pinning — sticky stages feel sluggish on touch and clip
+   copy on short screens. Chapters flow naturally; the field, day counter
+   and chapter behaviors still ride the scroll. Hero + finale keep their
+   full-screen presence. */
+@media (max-width: 760px) {
+  .ch.ch--zero, .ch.ch--leak, .ch.ch--attract, .ch.ch--book, .ch.ch--compound, .ch.ch--begin {
+    min-height: auto;
+  }
+  .ch .ch__pin {
+    position: static;
+    min-height: auto;
+    padding: clamp(3.5rem, 9vh, 5rem) var(--pad-x) 6.5rem;
+  }
+  .ch--zero .ch__pin, .ch--begin .ch__pin {
+    min-height: 100vh;
+    min-height: 100svh;
+    padding-bottom: 6.5rem;
+  }
 }
 
 /* ---------- cursor ---------- */
