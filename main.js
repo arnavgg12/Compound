@@ -70,43 +70,56 @@ const boot = document.getElementById("boot");
     return;
   }
   document.body.classList.add("is-booting");
+  safeStorage.set("compound-booted", "1"); /* set at start — failsafe paths
+    and storage-less sessions must not replay the curtain forever */
   const eq = document.getElementById("bootEq");
-  const T = 1050;
+  const T = 550; /* the brand moment survives at half the wait */
   const t0 = performance.now();
+  let iv = 0;
+  const finishBoot = () => {
+    clearInterval(iv);
+    if (!document.body.contains(boot)) return;
+    boot.classList.add("done");
+    document.body.classList.remove("is-booting");
+    startChoreography(); /* hero entrance rises as the curtain fades */
+    if (engine) engine.burst(); /* the year arrives with a pulse */
+    setTimeout(() => boot.remove(), 800);
+  };
   /* setInterval, not rAF — must run even in throttled webviews */
-  const iv = setInterval(() => {
+  iv = setInterval(() => {
     const p = clamp((performance.now() - t0) / T, 0, 1);
     const exp = Math.max(1, Math.round(p * 365));
     eq.innerHTML = `1.01<sup>${exp}</sup> = ${Math.pow(1.01, exp).toFixed(2)}`;
     if (p >= 1) {
       clearInterval(iv);
-      setTimeout(() => {
-        boot.classList.add("done");
-        document.body.classList.remove("is-booting");
-        safeStorage.set("compound-booted", "1");
-        startChoreography(); /* hero entrance rises as the curtain fades */
-        if (engine) engine.burst(); /* the year arrives with a pulse */
-        setTimeout(() => boot.remove(), 800);
-      }, 260);
+      setTimeout(finishBoot, 120);
     }
   }, 16);
-  /* failsafe — never trap the visitor behind the curtain */
-  setTimeout(() => {
-    if (document.body.contains(boot)) {
-      boot.classList.add("done");
-      document.body.classList.remove("is-booting");
-      startChoreography();
-      setTimeout(() => boot.remove(), 800);
-    }
-  }, 2600);
+  /* any input skips the curtain; the timeout is the failsafe */
+  ["scroll", "keydown", "pointerdown", "wheel"].forEach((ev) =>
+    addEventListener(ev, finishBoot, { once: true, passive: true })
+  );
+  setTimeout(finishBoot, 2200);
 })();
 
 /* ---------- the field ---------- */
+/* engine creation (context + 5 shader programs + particle scatter) is
+   ~50-150ms on low-end phones — keep it off the first-paint path. The
+   conductor null-checks `engine` everywhere, so late binding is free. */
 const canvas = document.getElementById("field");
-const engine = window.CompoundEngine
-  ? window.CompoundEngine.create(canvas, { reduced: REDUCED, lite: MOBILE })
-  : null;
-if (!engine) canvas.style.display = "none";
+let engine = null;
+function initEngine() {
+  if (engine) return;
+  engine = window.CompoundEngine
+    ? window.CompoundEngine.create(canvas, { reduced: REDUCED, lite: MOBILE })
+    : null;
+  if (!engine) canvas.style.display = "none";
+}
+const engineFallback = setTimeout(initEngine, 300); /* suspended-rAF webviews */
+requestAnimationFrame(() => requestAnimationFrame(() => {
+  clearTimeout(engineFallback);
+  initEngine();
+}));
 
 /* ---------- nav scrolled state ---------- */
 const nav = document.getElementById("nav");
@@ -144,7 +157,6 @@ new ResizeObserver(() => {
 /* ---------- HUD elements ---------- */
 const dayNum = document.getElementById("dayNum");
 const chapterTag = document.getElementById("chapterTag");
-const railFill = document.getElementById("railFill");
 const liveExp = document.getElementById("liveExp");
 const liveRes = document.getElementById("liveRes");
 
@@ -203,7 +215,6 @@ let lastTag = "";
 let lastDayShown = -1;
 let titleAt = 0;
 let lastVW = 0, lastVH = 0;
-let lastRailY = -1;
 let lastLiveDay = -1;
 
 /* the tab-title day-counter is a flourish for humans; gate it behind a
@@ -305,11 +316,6 @@ function frame(now) {
   if (tag !== lastTag) {
     lastTag = tag;
     chapterTag.textContent = tag;
-  }
-  const railY = Math.round(clamp(day / 365, 0, 1) * 100) / 100;
-  if (railY !== lastRailY) {
-    lastRailY = railY;
-    railFill.style.transform = `scaleY(${railY})`;
   }
   nav.classList.toggle("is-scrolled", target > 32);
 
@@ -619,6 +625,8 @@ async function botSays(html, { wide = false, pre = 420 } = {}) {
   return addIn(html, wide);
 }
 
+let kbDemo = false; /* keyboard users get focus moved to each new chip set */
+
 function offerChips(options) {
   chatChips.innerHTML = "";
   return new Promise((resolve) => {
@@ -627,7 +635,8 @@ function offerChips(options) {
       b.type = "button";
       b.className = "chip";
       b.textContent = label;
-      b.addEventListener("click", () => {
+      b.addEventListener("click", (e) => {
+        kbDemo = e.detail === 0; /* keyboard activation */
         startTimer();
         chatChips.innerHTML = "";
         addOut(label);
@@ -635,6 +644,10 @@ function offerChips(options) {
       });
       chatChips.appendChild(b);
     });
+    if (kbDemo) {
+      const first = chatChips.querySelector(".chip");
+      if (first) first.focus();
+    }
     scrollChat();
   });
 }
@@ -661,8 +674,10 @@ function vizCard() {
     const chips = bubble.querySelectorAll(".viz__chip");
     let settle = null;
     let picked = null;
+    if (kbDemo && chips[0]) chips[0].focus();
     chips.forEach((chip) => {
-      chip.addEventListener("click", () => {
+      chip.addEventListener("click", (e) => {
+        kbDemo = e.detail === 0;
         startTimer();
         picked = chip.textContent;
         wall.setAttribute("fill", VIZ_COLORS[picked]);
@@ -739,6 +754,10 @@ async function runDemo() {
 
   finalTime.textContent = fmt(elapsed);
   demoResult.hidden = false;
+  if (kbDemo) {
+    const cta = demoResult.querySelector("a, button");
+    if (cta) cta.focus();
+  }
 }
 
 new IntersectionObserver(

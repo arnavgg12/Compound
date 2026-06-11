@@ -17,17 +17,18 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:image" content="https://arnavgg12.github.io/Compound/og.png" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23100e0b'/%3E%3Ctext x='27' y='44' font-family='Georgia,serif' font-size='34' fill='%23F3EFE6' text-anchor='middle'%3EC%3C/text%3E%3Ctext x='47' y='28' font-family='Georgia,serif' font-size='18' fill='%23C2914C' text-anchor='middle'%3En%3C/text%3E%3C/svg%3E" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=IBM+Plex+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=12" />
+  <link rel="preload" href="fonts/fraunces-var.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="fonts/instrument-var.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="styles.css?v=13" />
   <noscript><style>
-    .reveal,.kin .kw i{opacity:1;transform:none}
+    .reveal,.kin .kw i{opacity:1;visibility:visible;transform:none}
     #boot,#cursor,.hud{display:none!important}
     .noscript-note{display:block!important}
   </style></noscript>
 </head>
 <body>
+
+  <a class="skiplink mono" href="#begin">Skip to contact</a>
 
   <!-- boot -->
   <div id="boot" aria-hidden="true">
@@ -55,17 +56,16 @@
       <span class="hud__dayOf mono">/ 365</span>
     </div>
     <div class="hud__chapter mono" id="chapterTag">00 · DAY ZERO</div>
-    <div class="hud__rail"><span id="railFill"></span></div>
   </div>
 
   <div id="cursor" aria-hidden="true"><span id="cursorTag"></span></div>
 
   <p class="noscript-note mono" style="display:none">JavaScript is off — the year won&rsquo;t animate, but every word below still works. So does WhatsApp.</p>
 
-  <main id="top">
+  <main id="top" tabindex="-1">
 
     <!-- ======== CH 00 · DAY ZERO ======== -->
-    <section class="ch ch--zero" id="zero" data-days="0,7" data-tag="00 · DAY ZERO" data-beh="0">
+    <section class="ch ch--zero" id="zero" tabindex="-1" data-days="0,7" data-tag="00 · DAY ZERO" data-beh="0">
       <div class="ch__pin">
         <div class="ch__inner ch__inner--center">
           <p class="eyebrow mono reveal">Compound · an AI-native growth firm<span class="eyebrow__tail"> · New Delhi &rarr; everywhere</span></p>
@@ -85,7 +85,7 @@
     </section>
 
     <!-- ======== CH 01 · THE LEAK ======== -->
-    <section class="ch ch--leak" id="leak" data-days="8,29" data-tag="01 · THE LEAK" data-beh="1">
+    <section class="ch ch--leak" id="leak" tabindex="-1" data-days="8,29" data-tag="01 · THE LEAK" data-beh="1">
       <div class="ch__pin">
         <div class="ch__inner">
           <p class="kicker mono reveal">Days 1–29 · status quo</p>
@@ -103,7 +103,7 @@
     </section>
 
     <!-- ======== CH 02 · IGNITION ======== -->
-    <section class="ch ch--attract" id="attract" data-days="30,59" data-tag="02 · ATTRACT" data-beh="2">
+    <section class="ch ch--attract" id="attract" tabindex="-1" data-days="30,59" data-tag="02 · ATTRACT" data-beh="2">
       <div class="ch__pin">
         <div class="ch__inner">
           <p class="kicker mono reveal">Day 30 · ignition</p>
@@ -120,7 +120,7 @@
     </section>
 
     <!-- ======== CH 03 · CONVERT + DEMO ======== -->
-    <section class="ch ch--convert" id="convert" data-days="60,118" data-tag="03 · CONVERT" data-beh="3">
+    <section class="ch ch--convert" id="convert" tabindex="-1" data-days="60,118" data-tag="03 · CONVERT" data-beh="3">
       <div class="ch__flow">
         <div class="ch__inner">
           <p class="kicker mono reveal">Day 60 · the funnel learns manners</p>
@@ -140,17 +140,23 @@
             <div class="phone__header">
               <div class="phone__avatar" aria-hidden="true">AD</div>
               <div class="phone__id">
-                <p class="phone__name">Atelier Dhara</p>
+                <p class="phone__name">Atelier Dhara
+                  <svg class="phone__verified" viewBox="0 0 20 20" aria-label="Verified business"><path fill="#4fae9b" d="M10 1l2.1 1.7 2.7-.3 1 2.5 2.4 1.3-.6 2.6 1.4 2.2-1.4 2.2.6 2.6-2.4 1.3-1 2.5-2.7-.3L10 21l-2.1-1.7-2.7.3-1-2.5-2.4-1.3.6-2.6L1 11l1.4-2.2-.6-2.6 2.4-1.3 1-2.5 2.7.3z" transform="translate(0,-1)"/><path fill="#fff" d="M8.7 13.2L6.2 10.7l1-1 1.5 1.5 4-4 1 1z"/></svg>
+                </p>
                 <p class="phone__status" id="chatStatus">online</p>
               </div>
               <div class="phone__timer mono" id="chatTimer" aria-label="Elapsed time">0:00</div>
             </div>
-            <div class="phone__scroll" id="chatScroll">
+            <div class="phone__scroll" id="chatScroll" tabindex="0" role="log" aria-label="Chat with Atelier Dhara">
               <div class="phone__chat" id="chatLog" aria-live="polite"><noscript><p class="msg msg--note">JavaScript is off, so the simulation can&rsquo;t run here. The real engine, of course, runs anyway — WhatsApp us.</p></noscript></div>
             </div>
             <div class="phone__chips" id="chatChips"></div>
             <div class="phone__inputbar" aria-hidden="true">
-              <span class="phone__inputhint">The engine answers for the studio — in seconds, at any hour.</span>
+              <svg class="phone__glyph" viewBox="0 0 24 24"><path fill="currentColor" d="M12 22a10 10 0 1 1 0-20 10 10 0 0 1 0 20Zm0-1.5a8.5 8.5 0 1 0 0-17 8.5 8.5 0 0 0 0 17ZM8.5 9.5a1.25 1.25 0 1 1 2.5 0 1.25 1.25 0 0 1-2.5 0Zm4.5 0a1.25 1.25 0 1 1 2.5 0 1.25 1.25 0 0 1-2.5 0ZM7.6 13.7a.75.75 0 0 1 1.05-.15A5.6 5.6 0 0 0 12 14.6c1.23 0 2.4-.39 3.35-1.05a.75.75 0 1 1 .9 1.2A7.1 7.1 0 0 1 12 16.1a7.1 7.1 0 0 1-4.25-1.35.75.75 0 0 1-.15-1.05Z"/></svg>
+              <span class="phone__field">The engine answers — in seconds, at any hour.</span>
+              <span class="phone__mic">
+                <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 14a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v5a3 3 0 0 0 3 3Zm5-3a5 5 0 0 1-10 0H5.5a6.5 6.5 0 0 0 5.75 6.46V20h1.5v-2.54A6.5 6.5 0 0 0 18.5 11H17Z"/></svg>
+              </span>
             </div>
           </div>
 
@@ -168,7 +174,7 @@
     </section>
 
     <!-- ======== CH 04 · BOOK ======== -->
-    <section class="ch ch--book" id="book" data-days="119,179" data-tag="04 · BOOK" data-beh="4">
+    <section class="ch ch--book" id="book" tabindex="-1" data-days="119,179" data-tag="04 · BOOK" data-beh="4">
       <div class="ch__pin">
         <div class="ch__inner">
           <p class="kicker mono reveal">Day 120 · the calendar</p>
@@ -186,7 +192,7 @@
     </section>
 
     <!-- ======== CH 05 · COMPOUND ======== -->
-    <section class="ch ch--compound" id="compound" data-days="180,269" data-tag="05 · COMPOUND" data-beh="5">
+    <section class="ch ch--compound" id="compound" tabindex="-1" data-days="180,269" data-tag="05 · COMPOUND" data-beh="5">
       <div class="ch__pin">
         <div class="ch__inner">
           <p class="kicker mono reveal">Day 180 · the loop closes</p>
@@ -205,7 +211,7 @@
     </section>
 
     <!-- ======== CH 06 · PROOF ======== -->
-    <section class="ch ch--proof" id="proof" data-days="270,319" data-tag="06 · PROOF" data-beh="6">
+    <section class="ch ch--proof" id="proof" tabindex="-1" data-days="270,319" data-tag="06 · PROOF" data-beh="6">
       <div class="ch__flow">
         <div class="ch__inner ch__inner--wide">
           <p class="kicker mono reveal">Day 270 · in production</p>
@@ -253,7 +259,7 @@
     </section>
 
     <!-- ======== CH 07 · TERMS ======== -->
-    <section class="ch ch--terms" id="terms" data-days="320,364" data-tag="07 · THE TERMS" data-beh="6">
+    <section class="ch ch--terms" id="terms" tabindex="-1" data-days="320,364" data-tag="07 · THE TERMS" data-beh="6">
       <div class="ch__flow">
         <div class="ch__inner">
           <p class="kicker mono reveal">Day 320 · the terms</p>
@@ -297,7 +303,7 @@
     </section>
 
     <!-- ======== CH 08 · DAY 365 ======== -->
-    <section class="ch ch--begin" id="begin" data-days="365,365" data-tag="08 · BEGIN" data-beh="7">
+    <section class="ch ch--begin" id="begin" tabindex="-1" data-days="365,365" data-tag="08 · BEGIN" data-beh="7">
       <div class="ch__pin">
         <div class="ch__inner ch__inner--center">
           <p class="kicker mono reveal">Day 365</p>
@@ -348,7 +354,7 @@
       <p class="colophon__mark">compound<sup>n</sup></p>
       <div class="colophon__text">
         <p>An AI-native growth firm. We build growth engines for premium businesses — and we built this site in-house, like everything we ship. The particles, the physics, the year: handwritten, no libraries, no trackers.</p>
-        <p class="colophon__fine mono">Set in Fraunces, Instrument Sans &amp; IBM Plex Mono. © 2026 Compound. 1.01<sup>365</sup> = 37.78. <span id="buildTag">build 12</span></p>
+        <p class="colophon__fine mono">Set in Fraunces, Instrument Sans &amp; IBM Plex Mono. © 2026 Compound. 1.01<sup>365</sup> = 37.78. <span id="buildTag">build 13</span></p>
       </div>
       <nav class="colophon__nav" aria-label="Footer">
         <a href="#leak">The leak</a>
@@ -360,7 +366,7 @@
     </div>
   </footer>
 
-  <script src="engine.js?v=12"></script>
-  <script src="main.js?v=12"></script>
+  <script src="engine.js?v=13"></script>
+  <script src="main.js?v=13"></script>
 </body>
 </html>

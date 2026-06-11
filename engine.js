@@ -41,7 +41,7 @@ void main() {
   vec3 col = vSt < 1.0
     ? mix(c0, c1, clamp(vSt, 0.0, 1.0))
     : mix(c1, c2, clamp(vSt - 1.0, 0.0, 1.0));
-  col = mix(col, vec3(0.66, 1.0, 0.72), vFlash * 0.6);
+  col = mix(col, vec3(0.51, 0.75, 0.56), vFlash * 0.6);
   gl_FragColor = vec4(col, 1.0) * (disc * vAlpha);
 }`;
 
@@ -70,7 +70,7 @@ void main() {
   vec3 col = vSt < 1.0
     ? mix(c0, c1, clamp(vSt, 0.0, 1.0))
     : mix(c1, c2, clamp(vSt - 1.0, 0.0, 1.0));
-  col = mix(col, vec3(0.66, 1.0, 0.72), vFlash * 0.6);
+  col = mix(col, vec3(0.51, 0.75, 0.56), vFlash * 0.6);
   gl_FragColor = vec4(col, 1.0) * (vAlpha * 0.5);
 }`;
 
@@ -239,10 +239,24 @@ void main() {
       fbo = fboTex = null; /* dead with the old context */
       fboW = fboH = 0;
     });
+    /* fixed-capacity GPU buffers: per-frame bufferData at varying sizes
+       makes mobile drivers reallocate; allocate once, update with
+       bufferSubData */
+    function allocGpu() {
+      if (!N) return;
+      gl.bindBuffer(gl.ARRAY_BUFFER, partBuf);
+      gl.bufferData(gl.ARRAY_BUFFER, N * 5 * 4, gl.DYNAMIC_DRAW);
+      gl.bindBuffer(gl.ARRAY_BUFFER, lineBuf);
+      gl.bufferData(gl.ARRAY_BUFFER, N * 10 * 4, gl.DYNAMIC_DRAW);
+      gl.bindBuffer(gl.ARRAY_BUFFER, cellBuf);
+      gl.bufferData(gl.ARRAY_BUFFER, CELLS * 5 * 4, gl.DYNAMIC_DRAW);
+    }
+
     canvas.addEventListener("webglcontextrestored", () => {
       if (initGL()) {
         lost = false;
         resize();
+        allocGpu(); /* resize skips the N-change branch when N is unchanged */
       }
     });
 
@@ -349,6 +363,7 @@ void main() {
       if (target !== N) {
         N = target;
         lastUploadN = -1;
+        allocGpu();
         px = new Float32Array(N); py = new Float32Array(N);
         vx = new Float32Array(N); vy = new Float32Array(N);
         px0 = new Float32Array(N); py0 = new Float32Array(N);
@@ -541,7 +556,7 @@ void main() {
         inter[o + 4] = seed[i];
       }
       gl.bindBuffer(gl.ARRAY_BUFFER, partBuf);
-      gl.bufferData(gl.ARRAY_BUFFER, inter.subarray(0, n * 5), gl.DYNAMIC_DRAW);
+      gl.bufferSubData(gl.ARRAY_BUFFER, 0, inter.subarray(0, n * 5));
     }
 
     function drawPoints(buf, count, dim) {
@@ -622,7 +637,7 @@ void main() {
           cellInter[o + 4] = k / CELLS;
         }
         gl.bindBuffer(gl.ARRAY_BUFFER, cellBuf);
-        gl.bufferData(gl.ARRAY_BUFFER, cellInter, gl.DYNAMIC_DRAW);
+        gl.bufferSubData(gl.ARRAY_BUFFER, 0, cellInter);
         drawPoints(cellBuf, CELLS, dim * 0.9);
       }
 
@@ -643,7 +658,7 @@ void main() {
         }
         gl.useProgram(progL);
         gl.bindBuffer(gl.ARRAY_BUFFER, lineBuf);
-        gl.bufferData(gl.ARRAY_BUFFER, lineInter.subarray(0, n * 10), gl.DYNAMIC_DRAW);
+        gl.bufferSubData(gl.ARRAY_BUFFER, 0, lineInter.subarray(0, n * 10));
         gl.enableVertexAttribArray(locL.aPos);
         gl.enableVertexAttribArray(locL.aDat);
         gl.vertexAttribPointer(locL.aPos, 2, gl.FLOAT, false, 20, 0);
