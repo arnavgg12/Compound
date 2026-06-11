@@ -11,6 +11,9 @@ const EMAIL = "hello@compound.in"; // TODO: real address
 
 const REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const FINE_POINTER = window.matchMedia("(pointer: fine)").matches;
+/* phones get their own physics: 1:1 touch tracking, no boot curtain,
+   featherweight rendering — desktop keeps the cinema */
+const MOBILE = window.matchMedia("(pointer: coarse)").matches || window.matchMedia("(max-width: 760px)").matches;
 
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 const lerp = (a, b, t) => a + (b - a) * t;
@@ -36,7 +39,7 @@ let choreoStarted = false; /* must precede the boot IIFE — its early-return
 
 const boot = document.getElementById("boot");
 (function runBoot() {
-  if (REDUCED || safeStorage.get("compound-booted")) {
+  if (REDUCED || MOBILE || safeStorage.get("compound-booted")) {
     boot.remove();
     startChoreography();
     return;
@@ -76,7 +79,7 @@ const boot = document.getElementById("boot");
 /* ---------- the field ---------- */
 const canvas = document.getElementById("field");
 const engine = window.CompoundEngine
-  ? window.CompoundEngine.create(canvas, { reduced: REDUCED })
+  ? window.CompoundEngine.create(canvas, { reduced: REDUCED, lite: MOBILE })
   : null;
 if (!engine) canvas.style.display = "none";
 
@@ -160,6 +163,7 @@ let lastTag = "";
 let lastDayShown = -1;
 let titleAt = 0;
 let lastVW = 0, lastVH = 0;
+let lastRailY = -1;
 
 /* cursor state (moved inside the conductor so one loop drives everything) */
 const cursorOn = FINE_POINTER && !REDUCED;
@@ -213,9 +217,10 @@ function frame(now) {
     if (engine) engine.resize();
   }
 
-  /* smooth scroll value */
+  /* smooth scroll value — desktop only. On touch, anything that lags
+     the finger reads as broken: phones track scroll 1:1. */
   const target = window.scrollY;
-  smooth += (target - smooth) * (REDUCED ? 1 : 0.12);
+  smooth += (target - smooth) * (REDUCED || MOBILE ? 1 : 0.12);
   const vel = smooth - lastScroll;
   lastScroll = smooth;
 
@@ -228,7 +233,8 @@ function frame(now) {
   if (target + innerHeight >= document.body.scrollHeight - 4) day = 365;
   const d = Math.round(day);
 
-  /* HUD */
+  /* HUD — phones skip the per-frame skew and rail churn; the main
+     thread must stay free for compositor scrolling */
   if (dayOverride) {
     if (dayNum.textContent !== "001") dayNum.textContent = "001";
     lastDayShown = -1; /* force a rewrite when the override lifts */
@@ -236,12 +242,16 @@ function frame(now) {
     lastDayShown = d;
     dayNum.textContent = String(d).padStart(3, "0");
   }
-  if (!REDUCED) dayNum.style.transform = `skewX(${clamp(-vel * 0.18, -9, 9)}deg)`;
+  if (!REDUCED && !MOBILE) dayNum.style.transform = `skewX(${clamp(-vel * 0.18, -9, 9)}deg)`;
   if (tag !== lastTag) {
     lastTag = tag;
     chapterTag.textContent = tag;
   }
-  railFill.style.transform = `scaleY(${clamp(day / 365, 0, 1)})`;
+  const railY = Math.round(clamp(day / 365, 0, 1) * 100) / 100;
+  if (railY !== lastRailY) {
+    lastRailY = railY;
+    railFill.style.transform = `scaleY(${railY})`;
+  }
   nav.classList.toggle("is-scrolled", target > 32);
 
   /* live equation (compound chapter) */

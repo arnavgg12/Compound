@@ -152,6 +152,9 @@ void main() {
   function create(canvas, opts) {
     opts = opts || {};
     const reduced = !!opts.reduced;
+    /* lite = phones: no trail passes, fewer lights, no pointer chase —
+       the field must never cost the thumb a frame */
+    const lite = !!opts.lite;
 
     const gl = canvas.getContext("webgl", {
       alpha: false,
@@ -314,7 +317,7 @@ void main() {
       if (!lost) {
         gl.viewport(0, 0, canvas.width, canvas.height);
         /* accumulation target — trails persist here between frames */
-        if (!fbo || fboW !== canvas.width || fboH !== canvas.height) {
+        if (!lite && !reduced && (!fbo || fboW !== canvas.width || fboH !== canvas.height)) {
           if (fboTex) gl.deleteTexture(fboTex);
           if (fbo) gl.deleteFramebuffer(fbo);
           fboTex = gl.createTexture();
@@ -338,9 +341,12 @@ void main() {
       focalX = mobile ? W * 0.5 : W * 0.62;
       focalY = mobile ? H * 0.52 : H * 0.50;
       ringR = Math.min(W, H) * (mobile ? 0.30 : 0.26);
-      sizeScale = clamp(Math.min(W, H) / 800, 0.8, 1.5) * DPR;
+      /* lite fields have no trails to carry presence — dots run larger */
+      sizeScale = clamp(Math.min(W, H) / 800, 0.8, 1.5) * DPR * (lite ? 1.35 : 1);
 
-      const target = Math.round(clamp((W * H) / 80, 3000, 12000));
+      const target = lite
+        ? Math.round(clamp((W * H) / 170, 900, 2400))
+        : Math.round(clamp((W * H) / 80, 3000, 12000));
       if (target !== N) {
         N = target;
         lastUploadN = -1;
@@ -465,8 +471,9 @@ void main() {
           }
         }
 
-        /* pointer attention — the strangers follow it */
-        if (pOn) {
+        /* pointer attention — the strangers follow it (desktop only;
+           on touch this would fight the scrolling thumb) */
+        if (pOn && !lite) {
           const qx = pX - px[i], qy = pY - py[i];
           const qd = Math.sqrt(qx * qx + qy * qy);
           if (qd < 240 && qd > 0.5) {
@@ -543,11 +550,13 @@ void main() {
     function render(n) {
       const beh = state.beh;
       const dim = state.dim;
+      const useTrails = !reduced && !lite;
 
-      gl.bindFramebuffer(gl.FRAMEBUFFER, fbo); /* accumulate trails offscreen */
+      /* trails accumulate offscreen; lite/reduced draw straight to canvas */
+      gl.bindFramebuffer(gl.FRAMEBUFFER, useTrails ? fbo : null);
 
-      if (reduced) {
-        gl.clear(gl.COLOR_BUFFER_BIT); /* static field — no trails */
+      if (!useTrails) {
+        gl.clear(gl.COLOR_BUFFER_BIT); /* crisp frame — no trail passes */
       } else {
         gl.useProgram(progF);
         gl.bindBuffer(gl.ARRAY_BUFFER, triBuf);
@@ -598,7 +607,7 @@ void main() {
       }
 
       /* hairline trails — smooth continuous streaks, not dotted scratch */
-      if (!reduced) {
+      if (useTrails) {
         for (let i = 0; i < n; i++) {
           const o = i * 10;
           lineInter[o] = px0[i];
@@ -632,17 +641,19 @@ void main() {
       drawPoints(partBuf, n, dim);
 
       /* present the accumulation texture on the canvas */
-      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-      gl.useProgram(progB);
-      gl.bindBuffer(gl.ARRAY_BUFFER, triBuf);
-      gl.enableVertexAttribArray(locB.aPos);
-      gl.vertexAttribPointer(locB.aPos, 2, gl.FLOAT, false, 0, 0);
-      gl.activeTexture(gl.TEXTURE0);
-      gl.bindTexture(gl.TEXTURE_2D, fboTex);
-      gl.uniform1i(locB.uTex, 0);
-      gl.disable(gl.BLEND);
-      gl.drawArrays(gl.TRIANGLES, 0, 3);
-      gl.enable(gl.BLEND);
+      if (useTrails) {
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        gl.useProgram(progB);
+        gl.bindBuffer(gl.ARRAY_BUFFER, triBuf);
+        gl.enableVertexAttribArray(locB.aPos);
+        gl.vertexAttribPointer(locB.aPos, 2, gl.FLOAT, false, 0, 0);
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, fboTex);
+        gl.uniform1i(locB.uTex, 0);
+        gl.disable(gl.BLEND);
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
+        gl.enable(gl.BLEND);
+      }
     }
 
     /* ---------- public ---------- */
