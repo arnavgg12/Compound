@@ -259,11 +259,45 @@ body.hud--end .hud__day, body.hud--end .hud__chapter, body.hud--end .hud__rail {
   }
   /* the ticker tape reads as a broken control on touch — desktop only */
   .tape { display: none; }
-  /* heavier scrim: on phones every text block sits in the field's path */
+  /* heavier scrim: on phones every text block sits in the field's path.
+     Horizontal inset MUST stay inside the container padding (~1.4rem) —
+     wider scrims poke past the viewport and let the page pan sideways */
   .ch .ch__inner::before {
-    inset: -2.5rem -2rem;
+    inset: -2.5rem -1.2rem;
     background: radial-gradient(ellipse closest-side, rgba(16, 14, 11, 0.94) 65%, rgba(16, 14, 11, 0) 100%);
   }
+  .demo__result::before { inset: -2rem -1.2rem; }
+  /* belt + braces: phones have no sticky pins, so hidden is safe here,
+     and it covers browsers that don't support overflow: clip */
+  body { overflow-x: hidden; }
+  /* an 8000px smooth anchor cruise feels possessed on touch — jump */
+  html { scroll-behavior: auto; }
+  /* duplicate of the coarse-pointer scroll-trap fix: narrow viewports
+     are overwhelmingly touch, and this one must never miss.
+     (.phone prefix: this block sits before the base rule in the file) */
+  .phone .phone__scroll {
+    overscroll-behavior-y: auto;
+    height: min(48vh, 420px);
+    min-height: 320px;
+  }
+}
+
+/* touch devices regardless of width */
+@media (pointer: coarse) {
+  /* no double-tap-zoom delay on taps; pan + pinch stay native */
+  body { touch-action: manipulation; }
+  /* THE scroll trap: the chat fills most of a phone screen, and
+     `contain` refused to hand an at-boundary swipe back to the page —
+     thumbs died mid-page. Chain to the page, and shrink the capture
+     zone while we're at it. */
+  .phone .phone__scroll {
+    overscroll-behavior-y: auto;
+    height: min(48vh, 420px);
+    min-height: 320px;
+  }
+  /* tap targets */
+  .viz .viz__chip { padding: 0.6em 1em; }
+  .colophon__nav a { padding: 0.4em 0; }
   .ch.ch--zero, .ch.ch--leak, .ch.ch--attract, .ch.ch--book, .ch.ch--compound, .ch.ch--begin {
     min-height: auto;
   }

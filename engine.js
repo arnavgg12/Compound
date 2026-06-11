@@ -668,7 +668,7 @@ void main() {
       setState(s) { Object.assign(state, s); },
       burst() { if (!reduced) burstT = 1; },
       pulse(x, y) {
-        if (reduced) return;
+        if (reduced || lite) return; /* lite contract: no pointer effects */
         const n = aliveCount();
         for (let i = 0; i < n; i++) {
           const qx = px[i] - x, qy = py[i] - y;

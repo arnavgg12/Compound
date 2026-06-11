@@ -88,7 +88,9 @@ const nav = document.getElementById("nav");
 
 /* ---------- sections → days ---------- */
 let sections = [];
+let docH = 0; /* cached — reading scrollHeight per frame forces layout */
 function measure() {
+  docH = document.body.scrollHeight;
   sections = [...document.querySelectorAll(".ch")].map((el) => {
     const [a, b] = el.dataset.days.split(",").map(Number);
     return {
@@ -163,7 +165,9 @@ addEventListener("pointermove", (e) => {
   ptrOn = true;
 }, { passive: true });
 addEventListener("pointerdown", (e) => {
-  if (engine && !REDUCED) engine.pulse(e.clientX, e.clientY);
+  /* mouse only — on touch this fired a particle shockwave under the
+     thumb at the start of every scroll flick */
+  if (engine && !REDUCED && e.pointerType === "mouse") engine.pulse(e.clientX, e.clientY);
 }, { passive: true });
 
 /* ---------- the conductor ---------- */
@@ -215,6 +219,15 @@ function schedule() {
 
 function frame(now) {
   clearTimeout(toId);
+
+  /* hidden tab: the rAF side stops on its own, but the watchdog would
+     keep simulating at 16fps forever — idle at 2.5fps instead */
+  if (document.hidden) {
+    lastT = now;
+    toId = setTimeout(() => frame(performance.now()), 400);
+    return;
+  }
+
   const dt = clamp((now - lastT) / 1000, 0.001, 0.05);
   lastT = now;
 
@@ -241,7 +254,7 @@ function frame(now) {
   let { day, beh, tag } = dayAt(sc);
   /* the year must complete at the absolute bottom even when the page
      tail is shorter than the viewport */
-  if (target + innerHeight >= document.body.scrollHeight - 4) day = 365;
+  if (target + innerHeight >= docH - 4) day = 365;
   const d = Math.round(day);
 
   /* HUD — phones skip the per-frame skew and rail churn; the main
@@ -311,8 +324,13 @@ function frame(now) {
 schedule();
 
 document.addEventListener("visibilitychange", () => {
-  /* avoid a huge dt spike after the tab returns */
-  lastT = performance.now();
+  /* resume instantly and without a dt spike when the tab returns */
+  if (!document.hidden) {
+    clearTimeout(toId);
+    cancelAnimationFrame(rafId);
+    lastT = performance.now();
+    schedule();
+  }
 });
 
 /* ---------- CTA hover: the year restarts ---------- */
@@ -666,5 +684,5 @@ document.getElementById("replayDemo").addEventListener("click", () => {
   stopTimer();
   timerInt = null;
   runDemo();
-  document.getElementById("phone").scrollIntoView({ behavior: REDUCED ? "auto" : "smooth", block: "center" });
+  document.getElementById("phone").scrollIntoView({ behavior: REDUCED || MOBILE ? "auto" : "smooth", block: "center" });
 });
