@@ -137,6 +137,7 @@ function measure() {
       a, b,
       beh: +el.dataset.beh,
       tag: el.dataset.tag,
+      paper: el.classList.contains("ch--paper"),
     };
   });
 }
@@ -180,11 +181,12 @@ const dimIO = new IntersectionObserver(
     let d = 1;
     for (const [el, v] of DIM_FOR) if (dimVis.get(el)) d = Math.min(d, v);
     dimTarget = d;
-    document.body.classList.toggle("hud--yield", !!dimVis.get(demoStage));
   },
   { threshold: 0.15 }
 );
 DIM_FOR.forEach(([el]) => dimIO.observe(el));
+/* hud--yield (the counter leaving the stage over paper pages) is driven
+   by the conductor's scroll math, not IO — IO can starve in webviews */
 
 /* the fixed day counter must not sit on the brass tape or colophon */
 const endVis = new Map();
@@ -216,6 +218,7 @@ let lastDayShown = -1;
 let titleAt = 0;
 let lastVW = 0, lastVH = 0;
 let lastLiveDay = -1;
+let lastPaper = null;
 
 /* the tab-title day-counter is a flourish for humans; gate it behind a
    genuine scroll so Googlebot (which renders JS but never scrolls)
@@ -236,7 +239,7 @@ if (cursorOn) document.body.classList.add("has-cursor");
 function dayAt(sc) {
   if (!sections.length) return { day: 0, beh: 0, tag: "" };
   const first = sections[0];
-  if (sc < first.top) return { day: 0, beh: first.beh, tag: first.tag };
+  if (sc < first.top) return { day: 0, beh: first.beh, tag: first.tag, paper: false };
   for (let i = 0; i < sections.length; i++) {
     const s = sections[i];
     /* boundary = next section's top: offsetTop/offsetHeight round
@@ -244,11 +247,11 @@ function dayAt(sc) {
     const end = i + 1 < sections.length ? sections[i + 1].top : s.top + s.h;
     if (sc < end) {
       const t = clamp((sc - s.top) / Math.max(end - s.top, 1), 0, 1);
-      return { day: lerp(s.a, s.b, t), beh: s.beh, tag: s.tag };
+      return { day: lerp(s.a, s.b, t), beh: s.beh, tag: s.tag, paper: s.paper };
     }
   }
   const last = sections[sections.length - 1];
-  return { day: 365, beh: last.beh, tag: last.tag };
+  return { day: 365, beh: last.beh, tag: last.tag, paper: last.paper };
 }
 
 /* rAF + setTimeout watchdog race: some webviews (in-app browsers,
@@ -267,9 +270,11 @@ function frame(now) {
   clearTimeout(toId);
 
   /* hidden tab: the rAF side stops on its own, but the watchdog would
-     keep simulating at 16fps forever — idle at 2.5fps instead */
+     keep simulating at 16fps forever — idle at 2.5fps instead, and snap
+     the smoothed scroll so the return isn't a catch-up cruise */
   if (document.hidden) {
     lastT = now;
+    smooth = lastScroll = window.scrollY;
     toId = setTimeout(() => frame(performance.now()), 400);
     return;
   }
@@ -297,7 +302,7 @@ function frame(now) {
   /* anchor at viewport top: day 000 at rest, chapter handoff exactly
      when the next pinned headline takes the screen */
   const sc = smooth + 1;
-  let { day, beh, tag } = dayAt(sc);
+  let { day, beh, tag, paper } = dayAt(sc);
   /* the year must complete at the absolute bottom even when the page
      tail is shorter than the viewport */
   if (target + innerHeight >= docH - 4) day = 365;
@@ -316,6 +321,10 @@ function frame(now) {
   if (tag !== lastTag) {
     lastTag = tag;
     chapterTag.textContent = tag;
+  }
+  if (paper !== lastPaper) {
+    lastPaper = paper;
+    document.body.classList.toggle("hud--yield", paper);
   }
   nav.classList.toggle("is-scrolled", target > 32);
 

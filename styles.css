@@ -1216,6 +1216,85 @@ p.ch__aside.reveal { margin-top: 1.4rem; }
   );
 }
 
+
+/* ============================================================
+   THE PAPER WORLD — document chapters bound between the reels.
+   Cinema is ink and light; the demo, blueprint and terms are a
+   printed dossier: gallery-bright, hairline-ruled, folio-stamped.
+   ============================================================ */
+
+.ch--paper {
+  background: var(--paper);
+  color: var(--t-on-paper);
+  border-block: 1px solid var(--paper-line);
+}
+/* printed folio numeral — a graphic object, not a label */
+.ch--paper::before {
+  content: attr(data-folio);
+  position: absolute;
+  top: clamp(1rem, 4vw, 3rem);
+  right: clamp(1rem, 5vw, 4.5rem);
+  font-family: var(--serif);
+  font-weight: 350;
+  font-style: italic;
+  font-size: clamp(5rem, 16vw, 13rem);
+  line-height: 1;
+  color: rgba(46, 41, 32, 0.06);
+  pointer-events: none;
+}
+.ch--paper .kicker { color: var(--oxide, #8a6532); }
+.ch--paper .kin { color: var(--t-on-paper); }
+.ch--paper .kin__line--accent .kw i { color: #8a6532; }
+.ch--paper .ch__copy,
+.ch--paper .ch__aside,
+.ch--paper .lede { color: var(--t-on-paper-mute); }
+.ch--paper .ch__copy em,
+.ch--paper .ch__aside em { color: #8a6532; }
+/* no field behind paper — the scrim is dead weight */
+.ch--paper .ch__inner::before { display: none; }
+
+/* — ledger as a printed spec sheet — */
+.ch--paper .ledger { border-top-color: var(--paper-line); }
+.ch--paper .ledger__row { border-bottom-color: var(--paper-line); }
+.ch--paper .ledger__no { color: #8a6532; }
+.ch--paper .ledger__name { color: var(--t-on-paper); }
+.ch--paper .ledger__desc { color: var(--t-on-paper-mute); }
+.ch--paper .ledger__status { color: #8a6532; }
+
+/* — clauses as contract typography — */
+.ch--paper .clauses { border-top-color: var(--paper-line); }
+.ch--paper .clause { border-bottom-color: var(--paper-line); }
+.ch--paper .clause__no { color: #8a6532; }
+.ch--paper .clause__title { color: var(--t-on-paper); }
+.ch--paper .clause__text { color: var(--t-on-paper-mute); }
+
+/* — audience index, printed — */
+.ch--paper .audience { background: var(--paper-line); border-color: var(--paper-line); }
+.ch--paper .audience li { background: var(--bone); color: var(--t-on-paper); }
+@media (hover: hover) {
+  .ch--paper .audience li:hover { background: var(--paper); color: #8a6532; }
+}
+.ch--paper .who { color: var(--t-on-paper-mute); }
+.ch--paper .record { color: var(--t-on-paper-mute); }
+
+/* — the demo result reads as print, not glow — */
+.ch--paper .demo__result::before { display: none; }
+.ch--paper .demo__bigtime { color: #8a6532; }
+.ch--paper .demo__verdict { color: var(--t-on-paper); }
+.ch--paper .demo__copy { color: var(--t-on-paper-mute); }
+.ch--paper .btn--ghost {
+  border-color: var(--paper-line);
+  background: transparent;
+  color: var(--t-on-paper);
+}
+.ch--paper .btn--ghost:hover { border-color: #8a6532; color: #8a6532; }
+
+/* the phone gains real product-photo presence on paper */
+.ch--paper .phone {
+  border-color: var(--paper-line);
+  box-shadow: 0 36px 70px -28px rgba(46, 41, 32, 0.45), 0 0 0 6px rgba(255, 255, 255, 0.55);
+}
+
 /* ---------- reduced motion ---------- */
 
 @media (prefers-reduced-motion: reduce) {
