@@ -83,6 +83,7 @@ const boot = document.getElementById("boot");
     document.body.classList.remove("is-booting");
     startChoreography(); /* hero entrance rises as the curtain fades */
     if (engine) engine.burst(); /* the year arrives with a pulse */
+    shudderHero(); /* …and the headline feels it */
     setTimeout(() => boot.remove(), 800);
   };
   /* setInterval, not rAF — must run even in throttled webviews */
@@ -440,10 +441,25 @@ function runHeroEq() {
     if (p >= 1) clearInterval(heroEqIv);
   }, 16);
 }
+/* the cross-universe touch: when the field bursts, the type feels it */
+function shudderHero() {
+  if (REDUCED) return;
+  const h = document.querySelector(".kin--hero");
+  if (!h) return;
+  h.classList.remove("is-shudder");
+  void h.offsetWidth; /* restart the animation */
+  h.classList.add("is-shudder");
+}
+
+function heroMoment() {
+  runHeroEq();
+  if (engine && !REDUCED) engine.burst();
+  shudderHero();
+}
 const heroEqEl = document.getElementById("heroEq");
-heroEqEl.addEventListener("click", runHeroEq);
+heroEqEl.addEventListener("click", heroMoment);
 heroEqEl.addEventListener("keydown", (e) => {
-  if (e.key === "Enter" || e.key === " ") { e.preventDefault(); runHeroEq(); }
+  if (e.key === "Enter" || e.key === " ") { e.preventDefault(); heroMoment(); }
 });
 
 /* …but observation waits for the boot curtain, else the hero entrance
