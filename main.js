@@ -348,6 +348,18 @@ waMain.addEventListener("pointerleave", (e) => {
   dayNum.classList.remove("is-one");
 });
 
+/* the last touch they make gets the sunrise: tapping the CTA fires the
+   burst and flips the counter to Day 001 while WhatsApp opens */
+waMain.addEventListener("click", () => {
+  if (engine) engine.burst();
+  dayOverride = true;
+  dayNum.classList.add("is-one");
+  setTimeout(() => {
+    dayOverride = false;
+    dayNum.classList.remove("is-one");
+  }, 1600);
+});
+
 /* ---------- kinetic titles + reveals ---------- */
 /* stagger indices are set immediately… */
 document.querySelectorAll(".kin").forEach((kin) => {
@@ -359,11 +371,31 @@ document.querySelectorAll(".ch__inner, .colophon").forEach((scope) => {
   });
 });
 
+/* the signature: 1.01^n races to 365 in the hero, for everyone */
+const heroExp = document.getElementById("heroExp");
+const heroRes = document.getElementById("heroRes");
+let heroEqIv = null;
+function runHeroEq() {
+  if (REDUCED) return;
+  clearInterval(heroEqIv);
+  const T = 2000;
+  const t0 = performance.now();
+  heroEqIv = setInterval(() => {
+    const p = clamp((performance.now() - t0) / T, 0, 1);
+    const exp = Math.max(1, Math.round(p * 365));
+    heroExp.textContent = exp;
+    heroRes.textContent = Math.pow(1.01, exp).toFixed(2);
+    if (p >= 1) clearInterval(heroEqIv);
+  }, 16);
+}
+document.getElementById("heroEq").addEventListener("click", runHeroEq);
+
 /* …but observation waits for the boot curtain, else the hero entrance
    plays unseen behind the opaque overlay on every first visit */
 function startChoreography() {
   if (choreoStarted) return;
   choreoStarted = true;
+  setTimeout(runHeroEq, 500);
   const enterIO = (threshold, rootMargin) =>
     new IntersectionObserver(
       (entries, io) => {

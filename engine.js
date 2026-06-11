@@ -389,7 +389,12 @@ void main() {
       const coreR = massRadius() * 0.55;
       const damp = Math.pow(0.945, dtN);
 
-      for (let k = 0; k < CELLS; k++) cellGlow[k] *= Math.pow(0.93, dtN);
+      /* a booked calendar stays booked: lit cells latch instead of
+         flickering back out */
+      for (let k = 0; k < CELLS; k++) {
+        const floor = cellGlow[k] > 0.7 ? 0.7 : 0;
+        cellGlow[k] = Math.max(cellGlow[k] * Math.pow(0.985, dtN), floor);
+      }
 
       for (let i = 0; i < n; i++) {
         let ax = 0, ay = 0;
