@@ -257,6 +257,13 @@ body.hud--end .hud__day, body.hud--end .hud__chapter, body.hud--end .hud__rail {
     backdrop-filter: none;
     background: rgba(16, 14, 11, 0.93);
   }
+  /* the ticker tape reads as a broken control on touch — desktop only */
+  .tape { display: none; }
+  /* heavier scrim: on phones every text block sits in the field's path */
+  .ch .ch__inner::before {
+    inset: -2.5rem -2rem;
+    background: radial-gradient(ellipse closest-side, rgba(16, 14, 11, 0.94) 65%, rgba(16, 14, 11, 0) 100%);
+  }
   .ch.ch--zero, .ch.ch--leak, .ch.ch--attract, .ch.ch--book, .ch.ch--compound, .ch.ch--begin {
     min-height: auto;
   }

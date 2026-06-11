@@ -123,18 +123,29 @@ const liveRes = document.getElementById("liveRes");
 
 let dayOverride = false; /* CTA hover flips the counter to 001 */
 
-/* ---------- demo dim + HUD yielding ---------- */
+/* ---------- field dim + HUD yielding ---------- */
+/* the field yields the stage wherever dense text lives — the demo, and
+   the late chapters where the grown sun would sit behind the copy */
 let dimTarget = 1, dimCur = 1;
 const demoStage = document.querySelector(".demo__stage");
-new IntersectionObserver(
+const DIM_FOR = [
+  [demoStage, 0.32],
+  [document.getElementById("compound"), 0.55],
+  [document.getElementById("proof"), 0.38],
+  [document.getElementById("terms"), 0.38],
+];
+const dimVis = new Map();
+const dimIO = new IntersectionObserver(
   (entries) => {
-    /* last entry = latest state — e[0] can be a stale queued record */
-    const on = entries[entries.length - 1].isIntersecting;
-    dimTarget = on ? 0.32 : 1;
-    document.body.classList.toggle("hud--yield", on);
+    for (const e of entries) dimVis.set(e.target, e.isIntersecting);
+    let d = 1;
+    for (const [el, v] of DIM_FOR) if (dimVis.get(el)) d = Math.min(d, v);
+    dimTarget = d;
+    document.body.classList.toggle("hud--yield", !!dimVis.get(demoStage));
   },
-  { threshold: 0.18 }
-).observe(demoStage);
+  { threshold: 0.15 }
+);
+DIM_FOR.forEach(([el]) => dimIO.observe(el));
 
 /* the fixed day counter must not sit on the brass tape or colophon */
 const endVis = new Map();

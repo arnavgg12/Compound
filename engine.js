@@ -511,7 +511,8 @@ void main() {
 
     function massRadius() {
       const d = clamp(state.day / 365, 0, 1);
-      const base = lerp(10, Math.min(W, H) * 0.28, Math.pow(d, 1.6));
+      /* phones: smaller sun — the halo otherwise floods the viewport */
+      const base = lerp(10, Math.min(W, H) * (lite ? 0.20 : 0.28), Math.pow(d, 1.6));
       const breathe = 1 + 0.04 * Math.sin(time * 1.8);
       return base * breathe + massPulse * 9;
     }
@@ -583,7 +584,8 @@ void main() {
       gl.uniform1f(locG.uMassR, showMass ? massRadius() : 0.0);
       gl.uniform1f(locG.uRingR, ringR);
       gl.uniform1f(locG.uRingA, ringA * dim);
-      gl.uniform1f(locG.uDim, dim);
+      /* glow runs quieter on phones so copy stays readable over it */
+      gl.uniform1f(locG.uDim, dim * (lite ? 0.6 : 1));
       /* wrap at a common period of both shader sines — raw seconds
          overflow fp16 mediump on mobile GPUs after ~17 min */
       gl.uniform1f(locG.uTime, time % (10 * Math.PI));
