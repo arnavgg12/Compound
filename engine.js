@@ -457,13 +457,21 @@ void main() {
             if (Math.random() < 0.002 * dtN) { st[i] = 1; fl[i] = 0.7; }
           }
         } else if (beh === 5 || beh === 6 || beh === 7) {
-          /* COMPOUND / CALM / SUN — spiral in, feed the mass */
+          /* COMPOUND / CALM / SUN — spiral in, feed the mass.
+             The finale sun RISES: it sits high above the text horizon,
+             so the composition is sunrise over Day One, not noise. */
+          let bx = dx, by = dy, bd = dist;
+          if (beh === 7) {
+            bx = px[i] - W * 0.5;
+            by = py[i] - H * 0.26;
+            bd = Math.sqrt(bx * bx + by * by) || 1;
+          }
           const swirl = beh === 7 ? 0.085 : beh === 5 ? 0.06 : 0.035;
           const inward = beh === 7 ? 0.0009 : beh === 5 ? 0.00045 : 0.00022;
-          ax += (-dy / dist) * swirl - dx * inward;
-          ay += (dx / dist) * swirl - dy * inward;
+          ax += (-by / bd) * swirl - bx * inward;
+          ay += (bx / bd) * swirl - by * inward;
           st[i] = Math.min(2, st[i] + (beh === 7 ? 0.006 : 0.003) * dtN);
-          if (dist < coreR) {
+          if (bd < coreR) {
             massPulse = Math.min(1.6, massPulse + 0.10);
             respawnEdge(i);
             continue;
@@ -583,7 +591,9 @@ void main() {
       gl.enableVertexAttribArray(locG.aPos);
       gl.vertexAttribPointer(locG.aPos, 2, gl.FLOAT, false, 0, 0);
       gl.uniform2f(locG.uRes, W, H);
-      gl.uniform2f(locG.uFocal, focalX, focalY);
+      /* the finale glow rises with the sun */
+      if (beh === 7) gl.uniform2f(locG.uFocal, W * 0.5, H * 0.26);
+      else gl.uniform2f(locG.uFocal, focalX, focalY);
       gl.uniform1f(locG.uMassR, showMass ? massRadius() : 0.0);
       gl.uniform1f(locG.uRingR, ringR);
       gl.uniform1f(locG.uRingA, ringA * dim);
