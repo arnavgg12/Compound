@@ -317,7 +317,7 @@ void main() {
       if (!lost) {
         gl.viewport(0, 0, canvas.width, canvas.height);
         /* accumulation target — trails persist here between frames */
-        if (!lite && !reduced && (!fbo || fboW !== canvas.width || fboH !== canvas.height)) {
+        if (!reduced && (!fbo || fboW !== canvas.width || fboH !== canvas.height)) {
           if (fboTex) gl.deleteTexture(fboTex);
           if (fbo) gl.deleteFramebuffer(fbo);
           fboTex = gl.createTexture();
@@ -341,11 +341,10 @@ void main() {
       focalX = mobile ? W * 0.5 : W * 0.62;
       focalY = mobile ? H * 0.52 : H * 0.50;
       ringR = Math.min(W, H) * (mobile ? 0.30 : 0.26);
-      /* lite fields have no trails to carry presence — dots run larger */
-      sizeScale = clamp(Math.min(W, H) / 800, 0.8, 1.5) * DPR * (lite ? 1.35 : 1);
+      sizeScale = clamp(Math.min(W, H) / 800, 0.8, 1.5) * DPR * (lite ? 1.15 : 1);
 
       const target = lite
-        ? Math.round(clamp((W * H) / 170, 900, 2400))
+        ? Math.round(clamp((W * H) / 110, 1800, 4200))
         : Math.round(clamp((W * H) / 80, 3000, 12000));
       if (target !== N) {
         N = target;
@@ -511,8 +510,8 @@ void main() {
 
     function massRadius() {
       const d = clamp(state.day / 365, 0, 1);
-      /* phones: smaller sun — the halo otherwise floods the viewport */
-      const base = lerp(10, Math.min(W, H) * (lite ? 0.20 : 0.28), Math.pow(d, 1.6));
+      /* phones: slightly smaller sun so the halo never floods the copy */
+      const base = lerp(10, Math.min(W, H) * (lite ? 0.24 : 0.28), Math.pow(d, 1.6));
       const breathe = 1 + 0.04 * Math.sin(time * 1.8);
       return base * breathe + massPulse * 9;
     }
@@ -551,7 +550,8 @@ void main() {
     function render(n) {
       const beh = state.beh;
       const dim = state.dim;
-      const useTrails = !reduced && !lite;
+      const useTrails = !reduced; /* phones keep the streaks — the look
+        survives because text chapters dim the field independently */
 
       /* trails accumulate offscreen; lite/reduced draw straight to canvas */
       gl.bindFramebuffer(gl.FRAMEBUFFER, useTrails ? fbo : null);
@@ -564,8 +564,11 @@ void main() {
         gl.enableVertexAttribArray(locF.aPos);
         gl.vertexAttribPointer(locF.aPos, 2, gl.FLOAT, false, 0, 0);
         /* compound the per-frame wash by elapsed sim time so trail length
-           reads the same at 60fps and in throttled 15fps webviews */
-        const base = FADE_BY_BEH[beh] || 0.14;
+           reads the same at 60fps and in throttled 15fps webviews.
+           Phones get a fade floor: full-length finale rays swallow the
+           copy on a small screen. */
+        let base = FADE_BY_BEH[beh] || 0.14;
+        if (lite) base = Math.max(base, 0.2);
         gl.uniform1f(locF.uFade, 1 - Math.pow(1 - base, lastDtN));
         gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
         gl.drawArrays(gl.TRIANGLES, 0, 3);
@@ -584,8 +587,8 @@ void main() {
       gl.uniform1f(locG.uMassR, showMass ? massRadius() : 0.0);
       gl.uniform1f(locG.uRingR, ringR);
       gl.uniform1f(locG.uRingA, ringA * dim);
-      /* glow runs quieter on phones so copy stays readable over it */
-      gl.uniform1f(locG.uDim, dim * (lite ? 0.6 : 1));
+      /* glow runs a touch quieter on phones so copy stays readable */
+      gl.uniform1f(locG.uDim, dim * (lite ? 0.8 : 1));
       /* wrap at a common period of both shader sines — raw seconds
          overflow fp16 mediump on mobile GPUs after ~17 min */
       gl.uniform1f(locG.uTime, time % (10 * Math.PI));
