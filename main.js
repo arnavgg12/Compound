@@ -5,9 +5,9 @@
 "use strict";
 
 /* ---------- config (replace with real handles before launch) ---------- */
-const WHATSAPP_NUMBER = "919999999999"; // TODO: real number, country code, no '+'
-const WHATSAPP_TEXT = "Hi Compound — I run a premium business and I want a growth engine. Day one is today.";
+const WHATSAPP_NUMBER = "919999999999"; // TODO: real WhatsApp Business number, country code, no '+'
 const EMAIL = "hello@compound.in"; // TODO: real address
+const FOUNDER = "Arnav"; // first name used in the prefill
 
 const REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const FINE_POINTER = window.matchMedia("(pointer: fine)").matches;
@@ -19,12 +19,37 @@ const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 const lerp = (a, b, t) => a + (b - a) * t;
 
 /* ---------- contact links ---------- */
-const waHref = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_TEXT)}`;
-const waMain = document.getElementById("waMain");
-waMain.href = waHref;
+/* a message a dignified owner would actually send unedited — and that
+   hands Compound qualifying context. Category set by the finale chips. */
+let waCategory = "";
+function waMessage() {
+  const cat = waCategory ? ` I run ${waCategory},` : "";
+  return `Hi Compound — I came across your site.${cat} I'd like to talk about a growth engine for my city.`;
+}
+function buildWaHref() {
+  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(waMessage())}`;
+}
+const waTargets = ["waMain", "waNav", "waDemo"].map((id) => document.getElementById(id)).filter(Boolean);
+function syncWa() {
+  const href = buildWaHref();
+  waTargets.forEach((a) => (a.href = href));
+}
+syncWa();
+
 const mail = document.getElementById("mailLink");
 mail.href = `mailto:${EMAIL}?subject=${encodeURIComponent("A growth engine for my business")}`;
 mail.textContent = EMAIL;
+
+/* category chips on the finale pre-qualify the very first WhatsApp message */
+document.querySelectorAll(".catchip").forEach((chip) => {
+  chip.addEventListener("click", () => {
+    const on = chip.classList.contains("is-on");
+    document.querySelectorAll(".catchip").forEach((c) => c.classList.remove("is-on"));
+    if (!on) { chip.classList.add("is-on"); waCategory = chip.dataset.cat; }
+    else { waCategory = ""; }
+    syncWa();
+  });
+});
 
 /* ---------- boot ---------- */
 /* sessionStorage throws under "block all cookies" / partitioned webviews —
@@ -179,6 +204,16 @@ let lastDayShown = -1;
 let titleAt = 0;
 let lastVW = 0, lastVH = 0;
 let lastRailY = -1;
+let lastLiveDay = -1;
+
+/* the tab-title day-counter is a flourish for humans; gate it behind a
+   genuine scroll so Googlebot (which renders JS but never scrolls)
+   snapshots the static keyworded title */
+let userEngaged = false;
+const markEngaged = () => { userEngaged = true; };
+addEventListener("scroll", markEngaged, { once: true, passive: true });
+addEventListener("pointerdown", markEngaged, { once: true, passive: true });
+addEventListener("keydown", markEngaged, { once: true });
 
 /* cursor state (moved inside the conductor so one loop drives everything) */
 const cursorOn = FINE_POINTER && !REDUCED;
@@ -278,14 +313,16 @@ function frame(now) {
   }
   nav.classList.toggle("is-scrolled", target > 32);
 
-  /* live equation (compound chapter) */
-  if (day >= 150 && day <= 290) {
+  /* live equation (compound chapter) — only on integer-day change */
+  if (day >= 150 && day <= 290 && d !== lastLiveDay) {
+    lastLiveDay = d;
     liveExp.textContent = d;
-    liveRes.textContent = Math.pow(1.01, day).toFixed(2);
+    liveRes.textContent = Math.pow(1.01, d).toFixed(2);
   }
 
-  /* tab title — throttled */
-  if (now - titleAt > 600) {
+  /* tab title — only after a real human scroll, so crawlers keep the
+     static keyworded <title> instead of indexing "Day 000 of 365" */
+  if (userEngaged && now - titleAt > 600) {
     titleAt = now;
     const t = dayOverride ? "Day 001 — Compound" : `Day ${String(d).padStart(3, "0")} of 365 — Compound`;
     if (document.title !== t) document.title = t;
@@ -388,7 +425,11 @@ function runHeroEq() {
     if (p >= 1) clearInterval(heroEqIv);
   }, 16);
 }
-document.getElementById("heroEq").addEventListener("click", runHeroEq);
+const heroEqEl = document.getElementById("heroEq");
+heroEqEl.addEventListener("click", runHeroEq);
+heroEqEl.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" || e.key === " ") { e.preventDefault(); runHeroEq(); }
+});
 
 /* …but observation waits for the boot curtain, else the hero entrance
    plays unseen behind the opaque overlay on every first visit */
@@ -536,7 +577,7 @@ function addNote(text) {
 function addOut(text) {
   const el = document.createElement("div");
   el.className = "msg msg--out";
-  el.innerHTML = `${text}<span class="msg__meta">${stamp()} <span class="msg__ticks">✓✓</span></span>`;
+  el.innerHTML = `${text}<span class="msg__meta" aria-hidden="true">${stamp()} <span class="msg__ticks">✓✓</span></span>`;
   chatLog.appendChild(el);
   scrollChat();
 }
@@ -544,7 +585,7 @@ function addOut(text) {
 function addIn(html, wide = false) {
   const el = document.createElement("div");
   el.className = "msg msg--in" + (wide ? " msg--wide" : "");
-  el.innerHTML = `${html}<span class="msg__meta">${stamp()}</span>`;
+  el.innerHTML = `${html}<span class="msg__meta" aria-hidden="true">${stamp()}</span>`;
   chatLog.appendChild(el);
   scrollChat();
   return el;
@@ -567,6 +608,7 @@ async function botSays(html, { wide = false, pre = 420 } = {}) {
   setTyping(true);
   const t = document.createElement("div");
   t.className = "msg msg--in msg--typing";
+  t.setAttribute("aria-hidden", "true");
   t.innerHTML = "<i></i><i></i><i></i>";
   chatLog.appendChild(t);
   scrollChat();
@@ -662,9 +704,9 @@ async function runDemo() {
   chatTimer.textContent = "0:00";
   setTyping(false);
 
-  addNote("Working replica of Engine №001 — the WhatsApp funnel we run for a Delhi interiors studio (name changed). You play the customer. The clock starts when you reply.");
+  addNote("A working demonstration of the funnel we build for premium interiors studios — fictional studio, real mechanics. You play the customer. The clock starts when you reply.");
 
-  await botSays("Namaste 🙏 Mira here, from Atelier Dhara. You found us through our 90-day full-home film — glad it resonated.", { pre: 900 });
+  await botSays("Namaste 🙏 Mira here, from Atelier Dhara. You found us through our 90-day full-home film — glad it found you.", { pre: 900 });
   await botSays("So I show you the right work — which city is the project in?");
   const city = await offerChips(["Delhi", "Gurugram", "Another city"]);
 
@@ -680,20 +722,20 @@ async function runDemo() {
   const budget = await offerChips(["₹8–15L", "₹15–30L", "₹30L+"]);
 
   const tier = { "₹8–15L": "Essential Luxe", "₹15–30L": "Signature", "₹30L+": "Bespoke" }[budget];
-  await botSays(`Great — that opens our <strong>${tier}</strong> portfolio. One quick piece of magic before we book:`);
+  await botSays(`Lovely — that opens our <strong>${tier}</strong> portfolio. One thing before we book — pick a finish, watch the wall change:`);
   await vizCard();
 
-  await botSays("That finish makes clients gasp 😄 Ananya, our principal designer, kept two slots this week for a 25-minute video consult — free, no pressure:");
+  await botSays("A beautiful choice — that&rsquo;s our most-requested finish this season. Ananya, our principal designer, kept two slots this week for a 25-minute video consult, complimentary:");
   const slot = await offerChips(["Thursday · 4:30 PM", "Saturday · 11:00 AM"]);
 
   stopTimer();
   await wait(500);
   bookingCard(slot);
-  await botSays("Done! She&rsquo;ll walk in knowing exactly what you love. Until then — the Gurugram penthouse film everyone asks about 🎬");
+  await botSays("Done — she&rsquo;ll walk in knowing exactly what you love. See you then. 🙂");
 
   await wait(700);
-  addNote(`Simulation complete — booked in ${fmt(elapsed)}. No human touched this. The studio was asleep.`);
-  chipsHint("simulation complete");
+  addNote(`Booked in ${fmt(elapsed)} — the studio was asleep. The machine works nights; a human reviews every booking before the consult and keeps the relationship.`);
+  chipsHint("demonstration complete");
 
   finalTime.textContent = fmt(elapsed);
   demoResult.hidden = false;
