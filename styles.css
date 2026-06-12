@@ -229,7 +229,8 @@ main { position: relative; z-index: 1; }
   -webkit-backdrop-filter: blur(14px) saturate(1.1);
   backdrop-filter: blur(14px) saturate(1.1);
   box-shadow: 0 1px 0 rgba(194, 145, 76, 0.2);
-  padding-block: 0.65rem;
+  /* keep clearing the notch when compacted */
+  padding-block: calc(0.65rem + env(safe-area-inset-top, 0px)) 0.65rem;
 }
 .nav__mark {
   font-family: var(--serif);
@@ -325,7 +326,7 @@ body.hud--end .hud__day, body.hud--end .hud__chapter {
   /* the marquee reads as a broken control on touch — phones get the
      brass band as a still, curated line instead */
   .tape .tape__track { display: none; } /* beats the later base rule */
-  .tape { padding-block: 0.8rem; }
+  .tape.tape { padding-block: 0.8rem; } /* beats the later base rule */
   .tape::after {
     content: "lead qualified 02:14 am · consultation booked · review captured · referral logged";
     display: block;
@@ -356,6 +357,22 @@ body.hud--end .hud__day, body.hud--end .hud__chapter {
     overscroll-behavior-y: auto;
     height: min(48vh, 420px);
     min-height: 320px;
+  }
+  /* pins off for ALL narrow viewports (incl. zoomed/snapped desktops) —
+     must match the coarse-pointer copy below, and must accompany this
+     block's body{overflow-x:hidden}, which would break sticky */
+  .ch.ch--zero, .ch.ch--leak, .ch.ch--attract, .ch.ch--book, .ch.ch--compound, .ch.ch--begin {
+    min-height: auto;
+  }
+  .ch .ch__pin {
+    position: static;
+    min-height: auto;
+    padding: clamp(3.5rem, 9vh, 5rem) var(--pad-x) 6.5rem;
+  }
+  .ch--zero .ch__pin, .ch--begin .ch__pin {
+    min-height: 100vh;
+    min-height: 100svh;
+    padding-bottom: 6.5rem;
   }
 }
 
@@ -437,7 +454,7 @@ body.hud--end .hud__day, body.hud--end .hud__chapter {
 #cursor.grow #cursorTag { opacity: 1; }
 #cursor.is-out { opacity: 0; }
 body.has-cursor #cursor { display: flex; }
-body.has-cursor a, body.has-cursor button { cursor: none; }
+body.has-cursor a, body.has-cursor button, body.has-cursor [role="button"] { cursor: none; }
 body.has-cursor { cursor: none; }
 
 /* ---------- chapters ---------- */
@@ -1301,8 +1318,11 @@ p.ch__aside.reveal { margin-top: 1.4rem; }
 
 /* — Plate №01: the client's world, painted in light — */
 .plate {
+  /* the inner is LEFT-anchored at exactly --pad-x from the viewport,
+     so the bleed is a pad-x pullback — the 50%/50vw trick assumes a
+     centered container and broke on wide desktops */
   width: 100vw;
-  margin-left: calc(50% - 50vw);
+  margin-left: calc(-1 * var(--pad-x));
   margin-block: clamp(2.4rem, 6vh, 4rem) var(--gap-2);
 }
 .plate__art {
@@ -1385,8 +1405,8 @@ p.ch__aside.reveal { margin-top: 1.4rem; }
 
 /* — role-based motion: kickers stamp in from the left,
      ledger rows carriage in from the right, headlines keep the rise — */
-.kicker.reveal { transform: translateX(-26px); }
-.ledger__row.reveal { transform: translateX(26px); }
+.kicker.reveal:not(.is-in) { transform: translateX(-26px); }
+.ledger__row.reveal:not(.is-in) { transform: translateX(26px); }
 
 /* — the cross-universe touch: type that feels the field — */
 @keyframes shudder {
@@ -1403,7 +1423,7 @@ p.ch__aside.reveal { margin-top: 1.4rem; }
   html { scroll-behavior: auto; }
   .phone__scroll { scroll-behavior: auto; }
   .reveal { opacity: 1; visibility: visible; transform: none; transition: none; }
-  .kicker.reveal, .ledger__row.reveal { transform: none; }
+  .kicker.reveal:not(.is-in), .ledger__row.reveal:not(.is-in) { transform: none; }
   .is-shudder { animation: none; }
   .kw i { transform: none; transition: none; }
   .tape__track { animation: none; }

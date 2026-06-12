@@ -233,7 +233,7 @@ addEventListener("keydown", markEngaged, { once: true });
 /* cursor state (moved inside the conductor so one loop drives everything) */
 const cursorOn = FINE_POINTER && !REDUCED;
 const cursorEl = document.getElementById("cursor");
-const HOVER = "a, button, .chip, .viz__chip";
+const HOVER = 'a, button, [role="button"], .chip, .viz__chip';
 let curX = -100, curY = -100;
 if (cursorOn) document.body.classList.add("has-cursor");
 
@@ -323,9 +323,12 @@ function frame(now) {
     lastTag = tag;
     chapterTag.textContent = tag;
   }
-  if (paper !== lastPaper) {
-    lastPaper = paper;
-    document.body.classList.toggle("hud--yield", paper);
+  /* the HUD lives at the viewport BOTTOM — judge paper-ness there,
+     or the counter sits on cream for a full viewport of approach */
+  const hudPaper = dayAt(sc + innerHeight * 0.92).paper;
+  if (hudPaper !== lastPaper) {
+    lastPaper = hudPaper;
+    document.body.classList.toggle("hud--yield", hudPaper);
   }
   nav.classList.toggle("is-scrolled", target > 32);
 

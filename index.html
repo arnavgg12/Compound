@@ -18,10 +18,12 @@
   <meta name="twitter:image" content="https://arnavgg12.github.io/Compound/og.png" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23100e0b'/%3E%3Ctext x='27' y='44' font-family='Georgia,serif' font-size='34' fill='%23F3EFE6' text-anchor='middle'%3EC%3C/text%3E%3Ctext x='47' y='28' font-family='Georgia,serif' font-size='18' fill='%23C2914C' text-anchor='middle'%3En%3C/text%3E%3C/svg%3E" />
   <link rel="preload" href="fonts/fraunces-var.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="fonts/fraunces-var-italic.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="fonts/instrument-var.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="styles.css?v=16" />
+  <link rel="stylesheet" href="styles.css?v=17" />
   <noscript><style>
     .reveal,.kin .kw i{opacity:1;visibility:visible;transform:none}
+    .kicker.reveal,.ledger__row.reveal{transform:none!important}
     #boot,#cursor,.hud{display:none!important}
     .noscript-note{display:block!important}
   </style></noscript>
@@ -43,7 +45,7 @@
   <!-- chrome -->
   <header class="nav" id="nav">
     <a class="nav__mark" href="#top" aria-label="Compound — back to day zero">compound<sup>n</sup></a>
-    <a class="nav__cta" id="waNav" href="#" target="_blank" rel="noopener" data-cursor="WHATSAPP">
+    <a class="nav__cta" id="waNav" href="https://wa.me/919999999999?text=Hi%20Compound%20%E2%80%94%20I%20came%20across%20your%20site.%20I%27d%20like%20to%20talk%20about%20a%20growth%20engine%20for%20my%20city." target="_blank" rel="noopener" data-cursor="WHATSAPP">
       <svg class="wa" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.6-6.1c-.3-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.3-.6.8-.8 1-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.4-2.9c-.3-.4 0-.5.1-.7l.4-.5c.1-.2.1-.3.2-.5 0-.2 0-.4-.1-.5l-.8-1.9c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5 0-.7.3-.3.3-1 .9-1 2.2s1 2.6 1.1 2.8c.1.2 2 3.1 4.9 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.6-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.6-.3Z"/></svg>
       <span class="nav__ctaLabel">WhatsApp&nbsp;us</span>
     </a>
@@ -74,7 +76,7 @@
             <span class="kin__line kin__line--accent"><span class="kw"><i>We&rsquo;d</i></span> <span class="kw"><i>rather</i></span> <span class="kw"><i>show</i></span> <span class="kw"><i>you</i></span> <span class="kw"><i>the&nbsp;year.</i></span></span>
           </h1>
           <p class="lede reveal">This page is the next 365 days of your business — the growth engine we build and run, in the order we build it. Strangers in, revenue out, data back in. You own all&nbsp;of&nbsp;it.</p>
-          <p class="heroEq reveal" id="heroEq" role="button" tabindex="0" aria-label="Replay the compounding equation: 1.01 to the power of 365 equals 37.78" title="Replay">
+          <p class="heroEq reveal" id="heroEq" role="button" tabindex="0" data-cursor="REPLAY" aria-label="Replay the compounding equation: 1.01 to the power of 365 equals 37.78" title="Replay">
             1.01<sup id="heroExp">365</sup>
             <span class="heroEq__eq">=</span>
             <span class="heroEq__res" id="heroRes">37.78</span><span class="heroEq__x">&times;</span>
@@ -165,7 +167,7 @@
             <p class="demo__verdict">Booked — while the studio slept.</p>
             <p class="demo__copy">No forms. No &ldquo;we&rsquo;ll call you back.&rdquo; Premium customers buy from whoever answers first — the engine makes sure that&rsquo;s you.</p>
             <div class="demo__ctaRow">
-              <a class="btn btn--brass" id="waDemo" href="#begin" target="_blank" rel="noopener" data-cursor="WHATSAPP">Get this engine <span class="btn__arrow">&rarr;</span></a>
+              <a class="btn btn--brass" id="waDemo" href="https://wa.me/919999999999?text=Hi%20Compound%20%E2%80%94%20I%20came%20across%20your%20site.%20I%27d%20like%20to%20talk%20about%20a%20growth%20engine%20for%20my%20city." target="_blank" rel="noopener" data-cursor="WHATSAPP">Get this engine <span class="btn__arrow">&rarr;</span></a>
               <button class="btn btn--ghost btn--mini" id="replayDemo" type="button" data-cursor="REPLAY">Replay <span class="btn__arrow">&#8635;</span></button>
             </div>
           </aside>
@@ -333,7 +335,7 @@
             <button type="button" class="catchip" data-cat="a premium retail brand">Retail</button>
           </div>
           <div class="begin__actions reveal">
-            <a class="btn btn--brass btn--big" id="waMain" href="#" target="_blank" rel="noopener" data-cursor="WHATSAPP">
+            <a class="btn btn--brass btn--big" id="waMain" href="https://wa.me/919999999999?text=Hi%20Compound%20%E2%80%94%20I%20came%20across%20your%20site.%20I%27d%20like%20to%20talk%20about%20a%20growth%20engine%20for%20my%20city." target="_blank" rel="noopener" data-cursor="WHATSAPP">
               <svg class="wa" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.6-6.1c-.3-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.3-.6.8-.8 1-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.4-2.9c-.3-.4 0-.5.1-.7l.4-.5c.1-.2.1-.3.2-.5 0-.2 0-.4-.1-.5l-.8-1.9c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5 0-.7.3-.3.3-1 .9-1 2.2s1 2.6 1.1 2.8c.1.2 2 3.1 4.9 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.6-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.6-.3Z"/></svg>
               Message Arnav on WhatsApp
             </a>
@@ -366,7 +368,7 @@
       <p class="colophon__mark">compound<sup>n</sup></p>
       <div class="colophon__text">
         <p>An AI-native growth firm. We build growth engines for premium businesses — and we built this site in-house, like everything we ship. The particles, the physics, the year: handwritten, no libraries, no trackers.</p>
-        <p class="colophon__fine mono">Set in Fraunces, Instrument Sans &amp; IBM Plex Mono. © 2026 Compound. 1.01<sup>365</sup> = 37.78. <span id="buildTag">build 16</span></p>
+        <p class="colophon__fine mono">Set in Fraunces, Instrument Sans &amp; IBM Plex Mono. © 2026 Compound. 1.01<sup>365</sup> = 37.78. <span id="buildTag">build 17</span></p>
       </div>
       <nav class="colophon__nav" aria-label="Footer">
         <a href="#leak">The leak</a>
@@ -378,7 +380,7 @@
     </div>
   </footer>
 
-  <script src="engine.js?v=16"></script>
-  <script src="main.js?v=16"></script>
+  <script src="engine.js?v=17"></script>
+  <script src="main.js?v=17"></script>
 </body>
 </html>
