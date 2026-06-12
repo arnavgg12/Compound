@@ -89,7 +89,9 @@
   --gap-2: clamp(1.7rem, 3.8vh, 2.6rem);
   --gap-3: clamp(2rem, 4.5vh, 3rem);
 
-  --pad-x: clamp(1.4rem, 5vw, 4.5rem);
+  /* content padding always clears notches and rounded corners
+     (viewport-fit=cover lets the ink run under them; text must not) */
+  --pad-x: max(clamp(1.4rem, 5vw, 4.5rem), env(safe-area-inset-left), env(safe-area-inset-right));
   --ease: cubic-bezier(0.22, 0.61, 0.21, 1);
 }
 
@@ -219,7 +221,7 @@ main { position: relative; z-index: 1; }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.95rem var(--pad-x);
+  padding: calc(0.95rem + env(safe-area-inset-top, 0px)) var(--pad-x) 0.95rem;
   transition: background 0.5s var(--ease), box-shadow 0.5s var(--ease), padding 0.5s var(--ease);
 }
 .nav.is-scrolled {
@@ -265,8 +267,8 @@ body.hud--end .hud__day, body.hud--end .hud__chapter {
 }
 .hud__day {
   position: fixed;
-  left: clamp(1.1rem, 3.5vw, 2.6rem);
-  bottom: clamp(0.9rem, 3vw, 2rem);
+  left: max(clamp(1.1rem, 3.5vw, 2.6rem), env(safe-area-inset-left));
+  bottom: calc(clamp(0.9rem, 3vw, 2rem) + env(safe-area-inset-bottom, 0px));
   z-index: 90;
   display: flex;
   align-items: baseline;
@@ -287,8 +289,8 @@ body.hud--end .hud__day, body.hud--end .hud__chapter {
 
 .hud__chapter {
   position: fixed;
-  right: clamp(1.1rem, 3.5vw, 2.6rem);
-  bottom: clamp(1rem, 3vw, 2.1rem);
+  right: max(clamp(1.1rem, 3.5vw, 2.6rem), env(safe-area-inset-right));
+  bottom: calc(clamp(1rem, 3vw, 2.1rem) + env(safe-area-inset-bottom, 0px));
   z-index: 90;
   font-size: var(--fs-micro);
   letter-spacing: 0.26em;
@@ -300,8 +302,8 @@ body.hud--end .hud__day, body.hud--end .hud__chapter {
 @media (max-width: 600px) {
   .hud__chapter {
     right: auto;
-    left: clamp(1.1rem, 3.5vw, 2.6rem);
-    bottom: calc(clamp(0.9rem, 3vw, 2rem) + 2.4rem);
+    left: max(clamp(1.1rem, 3.5vw, 2.6rem), env(safe-area-inset-left));
+    bottom: calc(clamp(0.9rem, 3vw, 2rem) + env(safe-area-inset-bottom, 0px) + 2.4rem);
     font-size: 0.58rem;
     letter-spacing: 0.22em;
   }
@@ -703,19 +705,16 @@ p.ch__aside.reveal { margin-top: 1.4rem; }
 
 /* ---------- founder ---------- */
 
+/* a signature, not a widget */
 .founder {
   display: inline-flex;
   align-items: center;
   gap: 0.85rem;
-  margin: 0 auto var(--gap-2);
-  padding: 0.55rem 1.1rem 0.55rem 0.6rem;
-  border: 1px solid var(--ink-line);
-  border-radius: 999px;
-  background: rgba(16, 14, 11, 0.5);
+  margin: var(--gap-2) auto 0.2rem;
 }
 .founder__mark {
-  width: 42px;
-  height: 42px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   background: var(--brass);
   color: var(--ink);
@@ -727,18 +726,17 @@ p.ch__aside.reveal { margin-top: 1.4rem; }
   place-items: center;
   flex: none;
 }
-.founder__by { display: flex; flex-direction: column; text-align: left; line-height: 1.25; }
-.founder__name { font-family: var(--serif); font-weight: 500; font-size: 1.1rem; }
+.founder__by { display: flex; flex-direction: column; text-align: left; line-height: 1.3; }
+.founder__name { font-family: var(--serif); font-style: italic; font-weight: 480; font-size: 1.25rem; }
 .founder__role { font-size: var(--fs-micro); letter-spacing: 0.12em; text-transform: uppercase; color: var(--t-on-ink-mute); }
 
 /* ---------- category prefill chips ---------- */
 
 .catpick {
-  font-size: var(--fs-label);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  font-family: var(--serif);
+  font-size: 1.05rem;
   color: var(--t-on-ink-mute);
-  margin-bottom: 0.8rem;
+  margin-bottom: 0.7rem;
 }
 .catchips {
   display: flex;
@@ -747,18 +745,19 @@ p.ch__aside.reveal { margin-top: 1.4rem; }
   justify-content: center;
 }
 .catchip {
-  font-family: var(--sans);
-  font-size: 0.92rem;
-  font-weight: 550;
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
   color: var(--t-on-ink);
-  background: rgba(16, 14, 11, 0.5);
-  border: 1px solid var(--ink-line);
+  background: transparent;
+  border: 1px solid rgba(194, 145, 76, 0.45);
   border-radius: 999px;
-  padding: 0.55em 1.2em;
+  padding: 0.6em 1.2em;
   cursor: pointer;
   transition: all 0.25s var(--ease);
 }
-.catchip:hover { border-color: var(--brass); color: var(--brass-2); }
+.catchip:hover { border-color: var(--brass-2); color: var(--brass-2); }
 .catchip.is-on { background: var(--brass); border-color: var(--brass); color: var(--ink); }
 
 /* ---------- demo / phone ---------- */
@@ -1360,6 +1359,16 @@ p.ch__aside.reveal { margin-top: 1.4rem; }
    clip (unlike hidden) does not create a scroll container, so the
    sticky pin inside survives */
 .ch--begin { overflow-x: clip; }
+@media (max-width: 760px) {
+  .ch--proof .bigno {
+    position: static;
+    font-size: clamp(4.2rem, 17vw, 6.5rem);
+    color: rgba(138, 101, 50, 0.18);
+    text-align: right;
+    padding: 1.2rem var(--pad-x) 0;
+    line-height: 1;
+  }
+}
 .bigno {
   position: absolute;
   top: clamp(0.4rem, 2.5vw, 1.8rem);
